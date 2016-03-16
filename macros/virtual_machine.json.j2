@@ -1,0 +1,88 @@
+{% macro create
+(
+   name                          = "[variables('vmName')]",
+   apiVersion                    = "[variables('apiVersion')]",
+   location                      = "[variables('location')]",
+   storageAccountName            = "variables('storageAccountName')",
+   vmStorageAccountContainerName = "variables('vmStorageAccountContainerName')",
+   nicName                       = "variables('nicName')",
+   vmSize                        = "[variables('vmSize')]",
+   adminUsername                 = "[variables('adminUsername')]",
+   adminPassword                 = "[variables('adminPassword')]",
+   imagePublisher                = "[variables('imagePublisher')]",
+   imageOffer                    = "[variables('imageOffer')]",
+   OSVersion                     = "[variables('OSVersion')]",
+   version                       = "latest",
+   OSDiskName                    = "variables('OSDiskName')",
+   sizeOfDiskInGB                = "[variables('sizeOfDiskInGB')]",
+   dataDisk1VhdName              = "variables('dataDisk1VhdName')",
+   extension                     = ""
+)
+-%}
+{
+      "type": "Microsoft.Compute/virtualMachines",
+      "apiVersion": "{{ apiVersion }}",
+      "name": "{{ name }}",
+      "location": "{{ location }}",
+      "dependsOn": [
+        "[concat('Microsoft.Storage/storageAccounts/',{{ storageAccountName }})]",
+        "[concat('Microsoft.Network/networkInterfaces/',{{ nicName }})]"
+      ],
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "{{ vmSize }}"
+        },
+        "osProfile": {
+          "computerName": "{{ name }}",
+          "adminUsername": "{{ adminUsername }}",
+          "adminPassword": "{{ adminPassword }}"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "{{ imagePublisher }}",
+            "offer": "{{ imageOffer }}",
+            "sku": "{{ OSVersion }}",
+            "version": "{{ version }}"
+          },
+          "osDisk": {
+            "name": "osdisk",
+            "vhd": {
+              "uri": "[concat('http://',{{ storageAccountName }},'.blob.core.windows.net/',{{  vmStorageAccountContainerName }},'/',{{ OSDiskName }},'.vhd')]"
+            },
+            "caching": "ReadWrite",
+            "createOption": "FromImage"
+          },
+          "dataDisks": [
+            {
+              "name": "datadisk1",
+              "diskSizeGB": "{{ sizeOfDiskInGB }}",
+              "lun": 0,
+              "vhd": {
+                "uri": "[concat('http://',{{ storageAccountName }},'.blob.core.windows.net/',{{ vmStorageAccountContainerName }},'/',{{ dataDisk1VhdName }},'.vhd')]"
+              },
+              "createOption": "Empty"
+            }
+          ]
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces',{{ nicName }})]"
+            }
+          ]
+        },
+        "diagnosticsProfile": {
+          "bootDiagnostics": {
+            "enabled": "true",
+            "storageUri": "[concat('http://',{{ storageAccountName }},'.blob.core.windows.net')]"
+          }
+        }
+      }
+      {% if extension %}
+      ,
+      "resources" : [
+         {{ extension }}
+      ]
+      {% endif %}
+}
+{%- endmacro %}

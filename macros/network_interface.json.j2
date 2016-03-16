@@ -1,0 +1,57 @@
+{% macro create
+(
+   name                     = "[variables('nicName')]",
+   apiVersion               = "[variables('apiVersion')]",
+   location                 = "[variables('location')]",
+   storageAccountType       = "[variables('storageAccountType')]",
+   addressPrefix            = "[variables('addressPrefix')]",
+   subnetName               = "[variables('subnetName')]",
+   subnetPrefix             = "[variables('subnetPrefix')]",
+   withPublicIP             = "false",
+   publicIPAddressName      = "variables('publicIPAddressName')",
+   virtualNetworkName       = "variables('virtualNetworkName')",
+   referenceNSG             = "false",
+   networkSecurityGroupName = "variables('networkSecurityGroupName')",
+   subnetRef                = "[variables('subnetRef')]"
+)
+-%}
+{
+   "type": "Microsoft.Network/networkInterfaces",
+   "apiVersion": "{{ apiVersion }}",
+   "location": "{{ location }}",
+   "name": "{{ name }}",
+   "dependsOn": [
+      {% if withPublicIP != "false" %}
+      "[concat('Microsoft.Network/publicIPAddresses/',{{ publicIPAddressName }})]",
+      {% endif %}
+      {% if referenceNSG != "false" %}
+      "[concat('Microsoft.Network/networkSecurityGroups/',{{ networkSecurityGroupName }})]",
+      {% endif %}
+      "[concat('Microsoft.Network/virtualNetworks/',{{ virtualNetworkName }})]"
+   ],
+   "properties": {
+     "ipConfigurations": [
+       {
+         "name": "ipconfig1",
+         "properties": {
+           "privateIPAllocationMethod": "Dynamic",
+	   {% if withPublicIP != "false" %}
+           "publicIPAddress": {
+	      "id": "[resourceId('Microsoft.Network/publicIPAddresses',{{ publicIPAddressName }})]"
+           },
+	   {% endif %}
+           "subnet": {
+	      "id": "{{ subnetRef }}"
+           }
+         }
+       }
+     ]
+     {% if referenceNSG != "false" %}
+     ,
+     "networkSecurityGroup": {
+        "id": "[resourceId('Microsoft.Network/networkSecurityGroups',{{ networkSecurityGroupName }})]"
+     }
+     {% endif %}
+   }
+}
+{%- endmacro %}

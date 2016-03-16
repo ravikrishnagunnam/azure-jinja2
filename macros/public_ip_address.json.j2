@@ -1,0 +1,19 @@
+{% macro create(name                = "[variables('publicIPAddressName')]",
+                apiVersion          = "[variables('apiVersion')]",
+                location            = "[variables('location')]",
+                publicIPAddressType = "[variables('publicIPAddressType')]",
+                dnsLabelPrefix      = "[variables('dnsLabelPrefix')]")
+-%}
+{
+   "type": "Microsoft.Network/publicIPAddresses",
+   "apiVersion": "{{ apiVersion }}",
+   "name": "{{ name }}",
+   "location": "{{ location }}",
+   "properties": {
+      "publicIPAllocationMethod": "{{ publicIPAddressType }}",
+      "dnsSettings": {
+         "domainNameLabel": "{{ dnsLabelPrefix }}"
+      }
+   }
+}
+{%- endmacro %}

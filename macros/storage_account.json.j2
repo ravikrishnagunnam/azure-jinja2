@@ -1,0 +1,15 @@
+{% macro create(storageAccountName = "[variables('storageAccountName')]",
+                apiVersion         = "[variables('apiVersion')]",
+                location           = "[variables('location')]",
+                storageAccountType = "[variables('storageAccountType')]")
+-%}
+{
+  "type": "Microsoft.Storage/storageAccounts",
+  "apiVersion": "{{ apiVersion }}",
+  "location": "{{ location }}",
+  "name": "{{ storageAccountName }}",
+  "properties": {
+     "accountType": "{{ storageAccountType }}"
+   }
+}
+{%- endmacro %}
