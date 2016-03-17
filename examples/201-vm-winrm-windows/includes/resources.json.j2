@@ -1,0 +1,26 @@
+{% import 'azure-jinja2/macros/storage_account.json.j2' as storage_account %}
+{% import 'azure-jinja2/macros/virtual_network.json.j2' as virtual_network %}
+{% import 'azure-jinja2/macros/public_ip_address.json.j2' as public_ip_address %}
+{% import 'azure-jinja2/macros/network_interface.json.j2' as network_interface %}
+{% import 'azure-jinja2/macros/virtual_machine.json.j2' as virtual_machine %}
+{% import 'azure-jinja2/macros/winrm_virtual_machine_extension.json.j2' as winrm_extension %}
+
+"resources" : [
+    {{ storage_account.create() }}
+    ,
+    {{ public_ip_address.create() }}
+    ,
+    {{ virtual_network.create() }}
+    ,
+    {{ network_interface.create(withPublicIP="true") }}
+    ,
+    {% set winRMExtension %}
+    {{ winrm_extension.create(arg1="variables('hostDNSNameScriptArgument')") }}
+    {% endset %}
+    {{ virtual_machine.create(
+          withDataDisk="false",
+	  withDiagnosticsProfile="false",
+          extension = winRMExtension
+       ) 
+    }}
+]
