@@ -14,9 +14,11 @@
    OSVersion                     = "[variables('OSVersion')]",
    version                       = "latest",
    OSDiskName                    = "variables('OSDiskName')",
+   withDataDisk                  = "true",
    sizeOfDiskInGB                = "[variables('sizeOfDiskInGB')]",
    dataDisk1VhdName              = "variables('dataDisk1VhdName')",
-   extension                     = ""
+   extension                     = "",
+   withDiagnosticsProfile        = "true"
 )
 -%}
 {
@@ -51,7 +53,9 @@
             },
             "caching": "ReadWrite",
             "createOption": "FromImage"
-          },
+          }
+	  {% if withDataDisk == "true" %}
+	  ,
           "dataDisks": [
             {
               "name": "datadisk1",
@@ -63,6 +67,7 @@
               "createOption": "Empty"
             }
           ]
+	  {% endif %}
         },
         "networkProfile": {
           "networkInterfaces": [
@@ -70,13 +75,16 @@
               "id": "[resourceId('Microsoft.Network/networkInterfaces',{{ nicName }})]"
             }
           ]
-        },
+        }
+	{% if withDiagnosticsProfile == "true" %}
+	,
         "diagnosticsProfile": {
           "bootDiagnostics": {
             "enabled": "true",
             "storageUri": "[concat('http://',{{ storageAccountName }},'.blob.core.windows.net')]"
           }
         }
+	{% endif %}
       }
       {% if extension %}
       ,

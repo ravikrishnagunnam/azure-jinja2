@@ -1,11 +1,11 @@
 {% macro create
 (
    name                = "variables('vmName')",
-   apiVersio           = "[variables('apiVersion')]",
+   apiVersion          = "[variables('apiVersion')]",
    location            = "[variables('location')]",
-   fileUris,
-   PSScripttoExecute,
-   argument1
+   fileUris            = "",
+   PSScriptToExecute   = "",
+   argument1           = ""
 )
 -%}
 {
@@ -23,10 +23,11 @@
          "settings": {
 	 "fileUris": [ {{ fileUris }} ],
          {% if argument1 %}
-	 "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -file {{ PSScriptToExecute }}',{{ argument1 }})]"
+	 "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -file {{ PSScriptToExecute }} ',{{ argument1 }})]"
          {% else %}
 	 "commandToExecute": "powershell -ExecutionPolicy Unrestricted -file {{ PSScriptToExecute }}"
          {% endif %}
          }
       }
 }
+{% endmacro %}

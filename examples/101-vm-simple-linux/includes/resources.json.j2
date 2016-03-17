@@ -1,8 +1,8 @@
-{% import 'azure-jinja2-macros/macros/storage_account.json.j2' as storage_account %}
-{% import 'azure-jinja2-macros/macros/virtual_network.json.j2' as virtual_network %}
-{% import 'azure-jinja2-macros/macros/public_ip_address.json.j2' as public_ip_address %}
-{% import 'azure-jinja2-macros/macros/network_interface.json.j2' as network_interface %}
-{% import 'azure-jinja2-macros/macros/virtual_machine.json.j2' as virtual_machine %}
+{% import 'azure-jinja2/macros/storage_account.json.j2' as storage_account %}
+{% import 'azure-jinja2/macros/virtual_network.json.j2' as virtual_network %}
+{% import 'azure-jinja2/macros/public_ip_address.json.j2' as public_ip_address %}
+{% import 'azure-jinja2/macros/network_interface.json.j2' as network_interface %}
+{% import 'azure-jinja2/macros/virtual_machine.json.j2' as virtual_machine %}
 
 "resources" : [
     {{ storage_account.create() }}
