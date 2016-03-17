@@ -1,10 +1,11 @@
-{% macro create(name               = "[variables('virtualNetworkName')]",
-                apiVersion         = "[variables('apiVersion')]",
-                location           = "[variables('location')]",
-                storageAccountType = "[variables('storageAccountType')]",
-                addressPrefix      = "[variables('addressPrefix')]",
-                subnetName         = "[variables('subnetName')]",
-                subnetPrefix       = "[variables('subnetPrefix')]")
+{% macro create(
+      name,
+      apiVersion,
+      location,
+      addressPrefix,
+      subnetName,
+      subnetPrefix
+   )
 -%}
 {
    "type": "Microsoft.Network/virtualNetworks",
@@ -21,10 +22,30 @@
         {
          "name": "{{ subnetName }}",
          "properties": {
-           "addressPrefix": "[variables('subnetPrefix')]"
+	    "addressPrefix": "{{ subnetPrefix }}"
          }
        }
      ]
    }
 }
+{%- endmacro %}
+
+{% macro from_vars(
+      name          = "[variables('virtualNetworkName')]",
+      apiVersion    = "[variables('apiVersion')]",
+      location      = "[variables('location')]",
+      addressPrefix = "[variables('addressPrefix')]",
+      subnetName    = "[variables('subnetName')]",
+      subnetPrefix  = "[variables('subnetPrefix')]")
+-%}
+{{
+   create(
+      name = name,
+      apiVersion = apiVersion,
+      location = location,
+      addressPrefix = addressPrefix,
+      subnetName = subnetName,
+      subnetPrefix = subnetPrefix
+   )
+}}
 {%- endmacro %}

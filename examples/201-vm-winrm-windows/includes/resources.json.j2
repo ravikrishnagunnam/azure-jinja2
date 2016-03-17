@@ -6,18 +6,18 @@
 {% import 'azure-jinja2/macros/winrm_virtual_machine_extension.json.j2' as winrm_extension %}
 
 "resources" : [
-    {{ storage_account.create() }}
+    {{ storage_account.from_vars() }}
     ,
-    {{ public_ip_address.create() }}
+    {{ public_ip_address.from_vars() }}
     ,
-    {{ virtual_network.create() }}
+    {{ virtual_network.from_vars() }}
     ,
-    {{ network_interface.create(withPublicIP="true") }}
+    {{ network_interface.from_vars(withPublicIP="true") }}
     ,
     {% set winRMExtension %}
     {{ winrm_extension.create(arg1="variables('hostDNSNameScriptArgument')") }}
     {% endset %}
-    {{ virtual_machine.create(
+    {{ virtual_machine.from_vars(
           withDataDisk="false",
 	  withDiagnosticsProfile="false",
           extension = winRMExtension

@@ -1,8 +1,10 @@
-{% macro create(name                = "[variables('publicIPAddressName')]",
-                apiVersion          = "[variables('apiVersion')]",
-                location            = "[variables('location')]",
-                publicIPAddressType = "[variables('publicIPAddressType')]",
-                dnsLabelPrefix      = "[variables('dnsLabelPrefix')]")
+{% macro create(
+      name,
+      apiVersion,
+      location,
+      type,
+      dnsLabelPrefix
+   )
 -%}
 {
    "type": "Microsoft.Network/publicIPAddresses",
@@ -10,10 +12,29 @@
    "name": "{{ name }}",
    "location": "{{ location }}",
    "properties": {
-      "publicIPAllocationMethod": "{{ publicIPAddressType }}",
+      "publicIPAllocationMethod": "{{ type }}",
       "dnsSettings": {
          "domainNameLabel": "{{ dnsLabelPrefix }}"
       }
    }
 }
+{%- endmacro %}
+
+{% macro from_vars(
+      name                = "[variables('publicIPAddressName')]",
+      apiVersion          = "[variables('apiVersion')]",
+      location            = "[variables('location')]",
+      type                = "[variables('publicIPAddressType')]",
+      dnsLabelPrefix      = "[variables('dnsLabelPrefix')]"
+   )
+-%}
+{{
+   create(
+      name = name,
+      apiVersion = apiVersion,
+      location = location,
+      type = type,
+      dnsLabelPrefix = dnsLabelPrefix 
+   )
+}}
 {%- endmacro %}

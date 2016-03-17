@@ -1,18 +1,14 @@
 {% macro create
 (
-   name                     = "[variables('nicName')]",
-   apiVersion               = "[variables('apiVersion')]",
-   location                 = "[variables('location')]",
-   storageAccountType       = "[variables('storageAccountType')]",
-   addressPrefix            = "[variables('addressPrefix')]",
-   subnetName               = "[variables('subnetName')]",
-   subnetPrefix             = "[variables('subnetPrefix')]",
-   withPublicIP             = "false",
-   publicIPAddressName      = "variables('publicIPAddressName')",
-   virtualNetworkName       = "variables('virtualNetworkName')",
-   referenceNSG             = "false",
-   networkSecurityGroupName = "variables('networkSecurityGroupName')",
-   subnetRef                = "[variables('subnetRef')]"
+   name,
+   apiVersion,
+   location,
+   virtualNetworkName,
+   subnetRef,
+   withPublicIP = "false",
+   publicIPAddressName = "",
+   withNSG = "false",
+   networkSecurityGroupName = ""
 )
 -%}
 {
@@ -24,7 +20,7 @@
       {% if withPublicIP != "false" %}
       "[concat('Microsoft.Network/publicIPAddresses/',{{ publicIPAddressName }})]",
       {% endif %}
-      {% if referenceNSG != "false" %}
+      {% if withNSG != "false" %}
       "[concat('Microsoft.Network/networkSecurityGroups/',{{ networkSecurityGroupName }})]",
       {% endif %}
       "[concat('Microsoft.Network/virtualNetworks/',{{ virtualNetworkName }})]"
@@ -46,7 +42,7 @@
          }
        }
      ]
-     {% if referenceNSG != "false" %}
+     {% if withNSG != "false" %}
      ,
      "networkSecurityGroup": {
         "id": "[resourceId('Microsoft.Network/networkSecurityGroups',{{ networkSecurityGroupName }})]"
@@ -54,4 +50,30 @@
      {% endif %}
    }
 }
+{%- endmacro %}
+
+{% macro from_vars(
+      name                     = "[variables('nicName')]",
+      apiVersion               = "[variables('apiVersion')]",
+      location                 = "[variables('location')]",
+      withPublicIP             = "false",
+      publicIPAddressName      = "variables('publicIPAddressName')",
+      virtualNetworkName       = "variables('virtualNetworkName')",
+      withNSG                  = "false",
+      networkSecurityGroupName = "variables('networkSecurityGroupName')",
+      subnetRef                = "[variables('subnetRef')]"
+)
+-%}
+{{ create(
+     name = name,
+     apiVersion = apiVersion,
+     location = location,
+     withPublicIP = withPublicIP,
+     publicIPAddressName = publicIPAddressName,
+     virtualNetworkName = virtualNetworkName,
+     withNSG = withNSG,
+     networkSecurityGroupName = networkSecurityGroupName,
+     subnetRef = subnetRef
+   )
+}}     
 {%- endmacro %}

@@ -5,13 +5,13 @@
 {% import 'azure-jinja2/macros/virtual_machine.json.j2' as virtual_machine %}
 
 "resources" : [
-    {{ storage_account.create() }}
+    {{ storage_account.from_vars() }}
     ,
-    {{ public_ip_address.create() }}
+    {{ public_ip_address.from_vars() }}
     ,
-    {{ virtual_network.create() }}
+    {{ virtual_network.from_vars() }}
     ,
-    {{ network_interface.create(withPublicIP="true") }}
+    {{ network_interface.from_vars(withPublicIP="true") }}
     ,
-    {{ virtual_machine.create() }}
+    {{ virtual_machine.from_vars() }}
 ]

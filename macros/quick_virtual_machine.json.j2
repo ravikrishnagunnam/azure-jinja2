@@ -1,0 +1,33 @@
+{% import 'azure-jinja2/macros/storage_account.json.j2' as storage_account %}
+{% import 'azure-jinja2/macros/network_interface.json.j2' as network_interface %}
+{% import 'azure-jinja2/macros/virtual_machine.json.j2' as virtual_machine %}
+
+{% macro from_vars(
+     name,
+     withPublicIP             = "false",
+     publicIPAddressName      = "variables('publicIPAddressName')",
+     withNSG                  = "false",
+     networkSecurityGroupName = "variables('networkSecurityGroupName')"
+  )
+%}
+     {% set sa_name %}[concat(uniqueString(resourceGroup().id), 'sac{{ name }}')]{% endset %}
+     {{ storage_account.from_vars(name = sa_name) }}
+     ,
+     {% set nic_name %}nic{{ name }}{% endset %}
+     {{ network_interface.from_vars(
+           name = nic_name,
+           withPublicIP = withPublicIP,
+           withNSG = withNSG
+        )
+     }}
+     ,
+     {% set sa_name_ref %}concat(uniqueString(resourceGroup().id), 'sac{{ name }}'){% endset %}
+     {% set nic_name_ref %}'nic{{ name }}'{% endset %}
+     {% set vm_name %}vm{{ name }}{% endset %}
+     {{ virtual_machine.from_vars(
+           name = vm_name,
+           storageAccountName = sa_name_ref,
+           nicName = nic_name_ref
+        )
+     }}
+{%- endmacro %}

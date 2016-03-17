@@ -1,0 +1,81 @@
+{% macro create(
+      name,
+      port,
+      priority,
+      protocol = "*",
+      sourcePortRange = "*",
+      sourceAddressPrefix = "*",
+      destinationAddressPrefix = "*",
+      access = "Allow",
+      direction = "Inbound"
+   )
+-%}
+{
+   "name": "{{ name }}",
+   "properties": {
+      "protocol": "{{ protocol }}",
+      "sourcePortRange": "{{ sourcePortRange }}",
+      "destinationPortRange": "{{ port }}",
+      "sourceAddressPrefix": "{{ sourceAddressPrefix }}",
+      "destinationAddressPrefix": "{{ destinationAddressPrefix }}",
+      "access": "{{ access }}",
+      "priority": {{ priority }},
+      "direction": "{{ direction }}"
+   }
+}
+{%- endmacro %}
+
+{% macro SSH() -%}
+{{ create(
+     name = "SSH",
+     port = "22",
+     priority = 1020
+   )
+}}
+{%- endmacro %}
+
+{% macro RDP() -%}
+{{ create(
+     name = "SSH",
+     port = "389",
+     priority = 1030
+   )
+}}
+{%- endmacro %}
+
+{% macro HTTP() -%}
+{{ create(
+     name = "HTTP",
+     port = "80",
+     priority = 1035
+   )
+}}
+
+{%- endmacro %}
+
+{% macro HTTPS() -%}
+{{ create(
+     name = "HTTPS",
+     port = "443",
+     priority = 1040
+   )
+}}
+{%- endmacro %}
+
+{% macro WINRM_HTTP() -%}
+{{ create(
+     name = "WINRM_HTTP",
+     port = "5985",
+     priority = 1050
+   )
+}}
+{%- endmacro %}
+
+{% macro WINRM_HTTPS() -%}
+{{ create(
+     name = "WINRM_HTTPS",
+     port = "5986",
+     priority = 1060
+   )
+}}
+{%- endmacro %}

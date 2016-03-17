@@ -1,24 +1,24 @@
 {% macro create
 (
-   name                          = "[variables('vmName')]",
-   apiVersion                    = "[variables('apiVersion')]",
-   location                      = "[variables('location')]",
-   storageAccountName            = "variables('storageAccountName')",
-   vmStorageAccountContainerName = "variables('vmStorageAccountContainerName')",
-   nicName                       = "variables('nicName')",
-   vmSize                        = "[variables('vmSize')]",
-   adminUsername                 = "[variables('adminUsername')]",
-   adminPassword                 = "[variables('adminPassword')]",
-   imagePublisher                = "[variables('imagePublisher')]",
-   imageOffer                    = "[variables('imageOffer')]",
-   OSVersion                     = "[variables('OSVersion')]",
-   version                       = "latest",
-   OSDiskName                    = "variables('OSDiskName')",
-   withDataDisk                  = "true",
-   sizeOfDiskInGB                = "[variables('sizeOfDiskInGB')]",
-   dataDisk1VhdName              = "variables('dataDisk1VhdName')",
-   extension                     = "",
-   withDiagnosticsProfile        = "true"
+   name,
+   apiVersion,
+   location,
+   storageAccountName,
+   vmStorageAccountContainerName,
+   nicName,
+   vmSize,
+   adminUsername,
+   adminPassword,
+   imagePublisher,
+   imageOffer,
+   OSVersion,
+   version,
+   OSDiskName,
+   withDataDisk,
+   sizeOfDiskInGB,
+   dataDisk1VhdName,
+   extension,
+   withDiagnosticsProfile
 )
 -%}
 {
@@ -93,4 +93,50 @@
       ]
       {% endif %}
 }
+{%- endmacro %}
+
+{% macro from_vars(
+      name                          = "[variables('vmName')]",
+      apiVersion                    = "[variables('apiVersion')]",
+      location                      = "[variables('location')]",
+      storageAccountName            = "variables('storageAccountName')",
+      vmStorageAccountContainerName = "variables('vmStorageAccountContainerName')",
+      nicName                       = "variables('nicName')",
+      vmSize                        = "[variables('vmSize')]",
+      adminUsername                 = "[variables('adminUsername')]",
+      adminPassword                 = "[variables('adminPassword')]",
+      imagePublisher                = "[variables('imagePublisher')]",
+      imageOffer                    = "[variables('imageOffer')]",
+      OSVersion                     = "[variables('OSVersion')]",
+      version                       = "latest",
+      OSDiskName                    = "variables('OSDiskName')",
+      withDataDisk                  = "true",
+      sizeOfDiskInGB                = "[variables('sizeOfDiskInGB')]",
+      dataDisk1VhdName              = "variables('dataDisk1VhdName')",
+      extension                     = "",
+      withDiagnosticsProfile        = "true"
+)
+-%}
+{{ create(
+      name                          = name,
+      apiVersion                    = apiVersion,
+      location                      = location,
+      storageAccountName            = storageAccountName,
+      vmStorageAccountContainerName = vmStorageAccountContainerName,
+      nicName                       = nicName,
+      vmSize                        = vmSize,
+      adminUsername                 = adminUsername,
+      adminPassword                 = adminPassword,
+      imagePublisher                = imagePublisher,
+      imageOffer                    = imageOffer,
+      OSVersion                     = OSVersion,
+      version                       = version,
+      OSDiskName                    = OSDiskName,
+      withDataDisk                  = withDataDisk,
+      sizeOfDiskInGB                = sizeOfDiskInGB,
+      dataDisk1VhdName              = dataDisk1VhdName,
+      extension                     = extension,
+      withDiagnosticsProfile        = withDiagnosticsProfile
+   )
+}}
 {%- endmacro %}
