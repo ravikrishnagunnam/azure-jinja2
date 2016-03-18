@@ -1,0 +1,17 @@
+{% import 'azure-jinja2/macros/storage_account.json.j2' as storage_account %}
+{% import 'azure-jinja2/macros/virtual_network.json.j2' as virtual_network %}
+{% import 'azure-jinja2/macros/public_ip_address.json.j2' as public_ip_address %}
+{% import 'azure-jinja2/macros/network_interface.json.j2' as network_interface %}
+{% import 'azure-jinja2/macros/virtual_machine.json.j2' as virtual_machine %}
+
+"resources" : [
+    {{ storage_account.from_vars() }}
+    ,
+    {{ public_ip_address.from_vars() }}
+    ,
+    {{ virtual_network.from_vars() }}
+    ,
+    {{ network_interface.from_vars(withPublicIP="true") }}
+    ,
+    {{ virtual_machine.from_vars(withSSHKey = "true") }}
+]
