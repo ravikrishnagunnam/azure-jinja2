@@ -4,6 +4,9 @@
 
 {% macro from_vars(
      name,
+     withSSHKey               = "false",
+     sshKeyData               = "[variables('sshKeyData')]",
+     sshKeyPath               = "[variables('sshKeyPath')]",
      withPublicIP             = "false",
      publicIPAddressName      = "variables('publicIPAddressName')",
      withNSG                  = "false",
@@ -17,7 +20,9 @@
      {{ network_interface.from_vars(
            name = nic_name,
            withPublicIP = withPublicIP,
-           withNSG = withNSG
+	   publicIPAddressName = publicIPAddressName,
+           withNSG = withNSG,
+	   networkSecurityGroupName = networkSecurityGroupName
         )
      }}
      ,
@@ -27,7 +32,10 @@
      {{ virtual_machine.from_vars(
            name = vm_name,
            storageAccountName = sa_name_ref,
-           nicName = nic_name_ref
+           nicName = nic_name_ref,
+	   withSSHKey = withSSHKey,
+	   sshKeyData = sshKeyData,
+	   sshKeyPath = sshKeyPath
         )
      }}
 {%- endmacro %}
