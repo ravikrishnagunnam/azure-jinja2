@@ -4,10 +4,8 @@
    apiVersion,
    location,
    virtualNetworkName,
-   subnetRef,
-   withPublicIP = "false",
+   subnetName,
    publicIPAddressName = "",
-   withNSG = "false",
    networkSecurityGroupName = ""
 )
 -%}
@@ -17,10 +15,10 @@
    "location": "{{ location }}",
    "name": "{{ name }}",
    "dependsOn": [
-      {% if withPublicIP != "false" %}
+      {% if publicIPAddressName %}
       "[concat('Microsoft.Network/publicIPAddresses/',{{ publicIPAddressName }})]",
       {% endif %}
-      {% if withNSG != "false" %}
+      {% if networkSecurityGroupName %}
       "[concat('Microsoft.Network/networkSecurityGroups/',{{ networkSecurityGroupName }})]",
       {% endif %}
       "[concat('Microsoft.Network/virtualNetworks/',{{ virtualNetworkName }})]"
@@ -31,18 +29,18 @@
          "name": "ipconfig1",
          "properties": {
            "privateIPAllocationMethod": "Dynamic",
-	   {% if withPublicIP != "false" %}
+	   {% if publicIPAddressName %}
            "publicIPAddress": {
 	      "id": "[resourceId('Microsoft.Network/publicIPAddresses',{{ publicIPAddressName }})]"
            },
 	   {% endif %}
            "subnet": {
-	      "id": "{{ subnetRef }}"
+	      "id": "[concat(resourceId('Microsoft.Network/virtualNetworks',{{ virtualNetworkName }}),'/subnets/',{{ subnetName }})]"
            }
          }
        }
      ]
-     {% if withNSG != "false" %}
+     {% if networkSecurityGroupName %}
      ,
      "networkSecurityGroup": {
         "id": "[resourceId('Microsoft.Network/networkSecurityGroups',{{ networkSecurityGroupName }})]"
@@ -61,19 +59,29 @@
       virtualNetworkName       = "variables('virtualNetworkName')",
       withNSG                  = "false",
       networkSecurityGroupName = "variables('networkSecurityGroupName')",
-      subnetRef                = "[variables('subnetRef')]"
+      subnetName               = "variables('subnetName')"
 )
 -%}
+{% if withPublicIP != "false" %}
+   {% set _publicIPAddressName = publicIPAddressName %}
+{% else %}
+   {% set _publicIPAddressName = "" %}
+{% endif %}
+
+{% if withNSG != "false" %}
+   {% set _networkSecurityGroupName = networkSecurityGroupName %}
+{% else %}
+   {% set _networkSecurityGroupName = "" %}
+{% endif %}
+
 {{ create(
      name = name,
      apiVersion = apiVersion,
      location = location,
-     withPublicIP = withPublicIP,
-     publicIPAddressName = publicIPAddressName,
+     publicIPAddressName = _publicIPAddressName,
      virtualNetworkName = virtualNetworkName,
-     withNSG = withNSG,
-     networkSecurityGroupName = networkSecurityGroupName,
-     subnetRef = subnetRef
+     networkSecurityGroupName = _networkSecurityGroupName,
+     subnetName = subnetName
    )
 }}     
 {%- endmacro %}

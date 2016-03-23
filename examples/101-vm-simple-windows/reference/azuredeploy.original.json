@@ -94,7 +94,7 @@
                                 "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
                             },
                             "subnet": {
-                                "id": "[variables('subnetRef')]"
+                                "id": "[concat(resourceId('Microsoft.Network/virtualNetworks',variables('virtualNetworkName')),'/subnets/',variables('subnetName'))]"
                             }
                         }
                     }
@@ -183,11 +183,9 @@
         "storageAccountType": "Standard_LRS",
         "subnetName": "Subnet",
         "subnetPrefix": "10.0.0.0/24",
-        "subnetRef": "[concat(variables('vnetID'),'/subnets/',variables('subnetName'))]",
         "virtualNetworkName": "MyVNET",
         "vmName": "SimpleWindowsVM",
         "vmSize": "Standard_D1",
-        "vmStorageAccountContainerName": "vhds",
-        "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',variables('virtualNetworkName'))]"
+        "vmStorageAccountContainerName": "vhds"
     }
 }
