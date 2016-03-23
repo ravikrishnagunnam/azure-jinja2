@@ -1,0 +1,19 @@
+"variables": {
+    "virtualNetworkName" : "['parameters('virtualNetworkName')]",
+    "addressPrefix" : "['parameters('vnetAddressPrefix')]",
+    "gatewayName" : "['parameters('gatewayName')]",
+    "gatewaySku" : "['parameters('gatewaySku')]",
+    "subnetPrefix" : "['parameters('gatewaySubnetPrefix')]",
+    "vpnClientAddressPoolPrefix" : "['parameters('vpnClientAddressPoolPrefix')]",
+    "clientRootCertName" : "['parameters('clientRootCertName')]",
+    "clientRootCertData" : "['parameters('clientRootCertData')]",
+    "revokedCertName" : "['parameters('revokedCertName')]",
+    "revokedCertThumbprint" : "['parameters('revokedCertThumbprint')]",
+    "publicIPAddressName": "['parameters('gatewayPublicIPName')]",
+    "publicIPAddressType": "Dynamic",
+    "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',variables('virtualNetworkName'))]",
+    "subnetName": "GatewaySubnet",
+    "apiVersion": "2015-06-15",
+    "location":"[resourceGroup().location]",
+    "gatewaySubnetRef":"[concat(variables('vnetID'),'/subnets/','GatewaySubnet')]"
+}

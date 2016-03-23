@@ -3,6 +3,7 @@
       apiVersion,
       location,
       type,
+      withDNS,
       dnsLabelPrefix
    )
 -%}
@@ -12,10 +13,13 @@
    "name": "{{ name }}",
    "location": "{{ location }}",
    "properties": {
-      "publicIPAllocationMethod": "{{ type }}",
+      "publicIPAllocationMethod": "{{ type }}"
+      {% if withDNS != "false" %}
+      ,
       "dnsSettings": {
          "domainNameLabel": "{{ dnsLabelPrefix }}"
       }
+      {% endif %}
    }
 }
 {%- endmacro %}
@@ -25,6 +29,7 @@
       apiVersion          = "[variables('apiVersion')]",
       location            = "[variables('location')]",
       type                = "[variables('publicIPAddressType')]",
+      withDNS             = "false",
       dnsLabelPrefix      = "[variables('dnsLabelPrefix')]"
    )
 -%}
@@ -34,6 +39,7 @@
       apiVersion = apiVersion,
       location = location,
       type = type,
+      withDNS = withDNS,
       dnsLabelPrefix = dnsLabelPrefix 
    )
 }}

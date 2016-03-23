@@ -1,0 +1,107 @@
+{# This is a comment #}
+
+{% macro create(
+     name,
+     apiVersion,
+     location,
+     publicIPAddressName,
+     virtualNetworkName,
+     gatewaySubnetRef,
+     gatewaySku,
+     vpnClientAddressPoolPrefix,
+     clientRootCertName,
+     clientRootCertData,
+     revokedCertName,
+     revokedCertThumbprint
+   )
+-%}
+{  
+   "type": "Microsoft.Network/virtualNetworkGateways",
+   "name": "{{ name }}",
+   "apiVersion": "{{ apiVersion }}",
+   "location": "{{ location }}",
+   "dependsOn": [  
+      "[concat('Microsoft.Network/publicIPAddresses/',{{ publicIPAddressName }})]",
+      "[concat('Microsoft.Network/virtualNetworks/',{{ virtualNetworkName }})]"
+   ],
+   "properties": {  
+      "ipConfigurations": [  
+         {  
+            "properties": {  
+               "privateIPAllocationMethod": "Dynamic",
+               "subnet": {  
+	          "id": "{{ gatewaySubnetRef }}"
+               },
+               "publicIPAddress": {  
+	          "id": "[resourceId('Microsoft.Network/publicIPAddresses',{{ publicIPAddressName }})]"
+               }
+            },
+            "name": "vnetGatewayConfig"
+         }
+      ],
+      "sku": {
+         "name": "{{ gatewaySku }}",
+         "tier": "{{ gatewaySku }}"
+      },            
+      "gatewayType": "Vpn",
+      "vpnType": "RouteBased",
+      "enableBgp": "false",
+      "vpnClientConfiguration": {  
+         "vpnClientAddressPool": {  
+            "addressPrefixes": [  
+	       "{{ vpnClientAddressPoolPrefix }}"
+            ]
+         },
+         "vpnClientRootCertificates": [  
+            {  
+	       "name": "{{ clientRootCertName }}",
+               "properties":{
+	          "PublicCertData": "{{ clientRootCertData }}"
+               }
+            }
+         ],
+         "vpnClientRevokedCertificates":[  
+            {  
+	       "name": "{{ revokedCertName }}",
+               "properties":{  
+	          "Thumbprint": "{{ revokedCertThumbprint }}"
+               }
+            }
+         ]
+      }
+   }
+}
+{%- endmacro %}
+
+{% macro from_vars(
+     name                       = "[variables('gatewayName')]",
+     apiVersion                 = "[variables('apiVersion')]",
+     location                   = "[variables('location')]",
+     publicIPAddressName        = "variables('publicIPAddressName')",
+     virtualNetworkName         = "variables('virtualNetworkName')",
+     gatewaySubnetRef           = "[variables('gatewaySubnetRef')]",
+     gatewaySku                 = "[variables('gatewaySku')]",
+     vpnClientAddressPoolPrefix = "[variables('vpnClientAddressPoolPrefix')]",
+     clientRootCertName         = "[variables('clientRootCertName')]",
+     clientRootCertData         = "[variables('clientRootCertData')]",
+     revokedCertName            = "[variables('revokedCertName')]",
+     revokedCertThumbprint      = "[variables('revokedCertThumbprint')]"
+   )
+-%}
+{{
+   create(
+     name = name,
+     apiVersion = apiVersion,
+     location = location,
+     publicIPAddressName = publicIPAddressName,
+     virtualNetworkName = virtualNetworkName,
+     gatewaySubnetRef = gatewaySubnetRef,
+     gatewaySku = gatewaySku,
+     vpnClientAddressPoolPrefix = vpnClientAddressPoolPrefix,
+     clientRootCertName = clientRootCertName,
+     clientRootCertData = clientRootCertData,
+     revokedCertName = revokedCertName,
+     revokedCertThumbprint = revokedCertThumbprint
+   )
+}}
+{%- endmacro %}
