@@ -1,199 +1,199 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.0.0",
-    "parameters": {
-        "adminPassword": {
-            "metadata": {
-                "description": "Password for the Virtual Machine."
-            },
-            "type": "securestring"
-        },
-        "adminUsername": {
-            "metadata": {
-                "description": "Username for the Virtual Machine."
-            },
-            "type": "string"
-        },
-        "dnsLabelPrefix": {
-            "metadata": {
-                "description": "Unique DNS Name for the Public IP used to access the Virtual Machine."
-            },
-            "type": "string"
-        },
-        "windowsOSVersion": {
-            "allowedValues": [
-                "2008-R2-SP1",
-                "2012-Datacenter",
-                "2012-R2-Datacenter"
-            ],
-            "defaultValue": "2012-R2-Datacenter",
-            "metadata": {
-                "description": "The Windows version for the VM. This will pick a fully patched image of this given Windows version. Allowed values: 2008-R2-SP1, 2012-Datacenter, 2012-R2-Datacenter."
-            },
-            "type": "string"
-        }
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "adminUsername": {
+      "type": "string",
+      "metadata": {
+        "description": "Username for the Virtual Machine."
+      }
     },
-    "resources": [
-        {
-            "apiVersion": "[variables('apiVersion')]",
-            "location": "[variables('location')]",
-            "name": "[variables('storageAccountName')]",
-            "properties": {
-                "accountType": "[variables('storageAccountType')]"
-            },
-            "type": "Microsoft.Storage/storageAccounts"
-        },
-        {
-            "apiVersion": "[variables('apiVersion')]",
-            "location": "[variables('location')]",
-            "name": "[variables('publicIPAddressName')]",
-            "properties": {
-                "dnsSettings": {
-                    "domainNameLabel": "[variables('dnsLabelPrefix')]"
-                },
-                "publicIPAllocationMethod": "[variables('publicIPAddressType')]"
-            },
-            "type": "Microsoft.Network/publicIPAddresses"
-        },
-        {
-            "apiVersion": "[variables('apiVersion')]",
-            "location": "[variables('location')]",
-            "name": "[variables('virtualNetworkName')]",
-            "properties": {
-                "addressSpace": {
-                    "addressPrefixes": [
-                        "[variables('addressPrefix')]"
-                    ]
-                },
-                "subnets": [
-                    {
-                        "name": "[variables('subnetName')]",
-                        "properties": {
-                            "addressPrefix": "[variables('subnetPrefix')]"
-                        }
-                    }
-                ]
-            },
-            "type": "Microsoft.Network/virtualNetworks"
-        },
-        {
-            "apiVersion": "[variables('apiVersion')]",
-            "dependsOn": [
-                "[concat('Microsoft.Network/publicIPAddresses/',variables('publicIPAddressName'))]",
-                "[concat('Microsoft.Network/virtualNetworks/',variables('virtualNetworkName'))]"
-            ],
-            "location": "[variables('location')]",
-            "name": "[variables('nicName')]",
-            "properties": {
-                "ipConfigurations": [
-                    {
-                        "name": "ipconfig1",
-                        "properties": {
-                            "privateIPAllocationMethod": "Dynamic",
-                            "publicIPAddress": {
-                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
-                            },
-                            "subnet": {
-                                "id": "[variables('subnetRef')]"
-                            }
-                        }
-                    }
-                ]
-            },
-            "type": "Microsoft.Network/networkInterfaces"
-        },
-        {
-            "apiVersion": "[variables('apiVersion')]",
-            "dependsOn": [
-                "[concat('Microsoft.Storage/storageAccounts/',variables('storageAccountName'))]",
-                "[concat('Microsoft.Network/networkInterfaces/',variables('nicName'))]"
-            ],
-            "location": "[variables('location')]",
-            "name": "[variables('vmName')]",
-            "properties": {
-                "hardwareProfile": {
-                    "vmSize": "[variables('vmSize')]"
-                },
-                "networkProfile": {
-                    "networkInterfaces": [
-                        {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName'))]"
-                        }
-                    ]
-                },
-                "osProfile": {
-                    "adminPassword": "[variables('adminPassword')]",
-                    "adminUsername": "[variables('adminUsername')]",
-                    "computerName": "[variables('vmName')]"
-                },
-                "storageProfile": {
-                    "imageReference": {
-                        "offer": "[variables('imageOffer')]",
-                        "publisher": "[variables('imagePublisher')]",
-                        "sku": "[variables('OSVersion')]",
-                        "version": "latest"
-                    },
-                    "osDisk": {
-                        "caching": "ReadWrite",
-                        "createOption": "FromImage",
-                        "name": "osdisk",
-                        "vhd": {
-                            "uri": "[concat('http://',variables('storageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/',variables('OSDiskName'),'.vhd')]"
-                        }
-                    }
-                }
-            },
-            "resources": [
-                {
-                    "apiVersion": "[variables('apiVersion')]",
-                    "dependsOn": [
-                        "[concat('Microsoft.Compute/virtualMachines/',variables('vmName'))]"
-                    ],
-                    "location": "[variables('location')]",
-                    "name": "[concat(variables('vmName'),'/WinRMCustomScriptExtension')]",
-                    "properties": {
-                        "publisher": "Microsoft.Compute",
-                        "settings": {
-                            "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -file ConfigureWinRM.ps1 ',variables('hostDNSNameScriptArgument'))]",
-                            "fileUris": [
-                                "https://raw.githubusercontent.com/sebbrochet/azure-jinja2/master/files/winrm_extension/ConfigureWinRM.ps1",
-                                "https://raw.githubusercontent.com/sebbrochet/azure-jinja2/master/files/winrm_extension/makecert.exe",
-                                "https://raw.githubusercontent.com/sebbrochet/azure-jinja2/master/files/winrm_extension/winrmconf.cmd"
-                            ]
-                        },
-                        "type": "CustomScriptExtension",
-                        "typeHandlerVersion": "1.4"
-                    },
-                    "type": "Microsoft.Compute/virtualMachines/extensions"
-                }
-            ],
-            "type": "Microsoft.Compute/virtualMachines"
-        }
-    ],
-    "variables": {
-        "OSDiskName": "osdiskforwindowssimple",
-        "OSVersion": "[parameters('windowsOSVersion')]",
-        "addressPrefix": "10.0.0.0/16",
-        "adminPassword": "[parameters('adminPassword')]",
-        "adminUsername": "[parameters('adminUsername')]",
-        "apiVersion": "2015-06-15",
-        "dnsLabelPrefix": "[parameters('dnsLabelPrefix')]",
-        "hostDNSNameScriptArgument": "[concat('*.',resourceGroup().location,'.cloudapp.azure.com')]",
-        "imageOffer": "WindowsServer",
-        "imagePublisher": "MicrosoftWindowsServer",
-        "location": "[resourceGroup().location]",
-        "nicName": "myVMNic",
-        "publicIPAddressName": "myPublicIP",
-        "publicIPAddressType": "Dynamic",
-        "storageAccountName": "[concat(uniqueString(resourceGroup().id),'sawinvm')]",
-        "storageAccountType": "Standard_LRS",
-        "subnetName": "Subnet",
-        "subnetPrefix": "10.0.0.0/24",
-        "subnetRef": "[concat(variables('vnetID'),'/subnets/',variables('subnetName'))]",
-        "virtualNetworkName": "MyVNET",
-        "vmName": "SimpleWindowsVM",
-        "vmSize": "Standard_D1",
-        "vmStorageAccountContainerName": "vhds",
-        "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',variables('virtualNetworkName'))]"
+    "adminPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Password for the Virtual Machine."
+      }
+    },
+    "dnsLabelPrefix": {
+      "type": "string",
+      "metadata": {
+        "description": "Unique DNS Name for the Public IP used to access the Virtual Machine."
+      }
+    },
+    "windowsOSVersion": {
+      "type": "string",
+      "defaultValue": "2012-R2-Datacenter",
+      "allowedValues": [
+        "2008-R2-SP1",
+        "2012-Datacenter",
+        "2012-R2-Datacenter"
+      ],
+      "metadata": {
+        "description": "The Windows version for the VM. This will pick a fully patched image of this given Windows version. Allowed values: 2008-R2-SP1, 2012-Datacenter, 2012-R2-Datacenter."
+      }
     }
+  },
+  "variables": {
+    "adminUsername": "[parameters('adminUsername')]",
+    "adminPassword": "[parameters('adminPassword')]",
+    "dnsLabelPrefix": "[parameters('dnsLabelPrefix')]",
+    "OSVersion": "[parameters('windowsOSVersion')]",
+    "storageAccountName": "[concat(uniqueString(resourceGroup().id),'sawinvm')]",
+    "location": "[resourceGroup().location]",
+    "imagePublisher": "MicrosoftWindowsServer",
+    "imageOffer": "WindowsServer",
+    "OSDiskName": "osdiskforwindowssimple",
+    "nicName": "myVMNic",
+    "addressPrefix": "10.0.0.0/16",
+    "subnetName": "Subnet",
+    "subnetPrefix": "10.0.0.0/24",
+    "storageAccountType": "Standard_LRS",
+    "publicIPAddressName": "myPublicIP",
+    "publicIPAddressType": "Dynamic",
+    "vmStorageAccountContainerName": "vhds",
+    "vmName": "SimpleWindowsVM",
+    "vmSize": "Standard_D1",
+    "virtualNetworkName": "MyVNET",
+    "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',variables('virtualNetworkName'))]",
+    "subnetRef": "[concat(variables('vnetID'),'/subnets/',variables('subnetName'))]",
+    "apiVersion": "2015-06-15",
+    "hostDNSNameScriptArgument": "[concat('*.',resourceGroup().location,'.cloudapp.azure.com')]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "[variables('apiVersion')]",
+      "location": "[variables('location')]",
+      "name": "[variables('storageAccountName')]",
+      "properties": {
+        "accountType": "[variables('storageAccountType')]"
+      }
+    },
+    {
+      "type": "Microsoft.Network/publicIPAddresses",
+      "apiVersion": "[variables('apiVersion')]",
+      "name": "[variables('publicIPAddressName')]",
+      "location": "[variables('location')]",
+      "properties": {
+        "publicIPAllocationMethod": "[variables('publicIPAddressType')]",
+        "dnsSettings": {
+          "domainNameLabel": "[variables('dnsLabelPrefix')]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Network/virtualNetworks",
+      "apiVersion": "[variables('apiVersion')]",
+      "location": "[variables('location')]",
+      "name": "[variables('virtualNetworkName')]",
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "[variables('addressPrefix')]"
+          ]
+        },
+        "subnets": [
+          {
+            "name": "[variables('subnetName')]",
+            "properties": {
+              "addressPrefix": "[variables('subnetPrefix')]"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Network/networkInterfaces",
+      "apiVersion": "[variables('apiVersion')]",
+      "location": "[variables('location')]",
+      "name": "[variables('nicName')]",
+      "dependsOn": [
+        "[concat('Microsoft.Network/publicIPAddresses/',variables('publicIPAddressName'))]",
+        "[concat('Microsoft.Network/virtualNetworks/',variables('virtualNetworkName'))]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Dynamic",
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
+              },
+              "subnet": {
+                "id": "[variables('subnetRef')]"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines",
+      "apiVersion": "[variables('apiVersion')]",
+      "name": "[variables('vmName')]",
+      "location": "[variables('location')]",
+      "dependsOn": [
+        "[concat('Microsoft.Storage/storageAccounts/',variables('storageAccountName'))]",
+        "[concat('Microsoft.Network/networkInterfaces/',variables('nicName'))]"
+      ],
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "[variables('vmSize')]"
+        },
+        "osProfile": {
+          "computerName": "[variables('vmName')]",
+          "adminUsername": "[variables('adminUsername')]",
+          "adminPassword": "[variables('adminPassword')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "[variables('imagePublisher')]",
+            "offer": "[variables('imageOffer')]",
+            "sku": "[variables('OSVersion')]",
+            "version": "latest"
+          },
+          "osDisk": {
+            "name": "osdisk",
+            "vhd": {
+              "uri": "[concat('http://',variables('storageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/',variables('OSDiskName'),'.vhd')]"
+            },
+            "caching": "ReadWrite",
+            "createOption": "FromImage"
+          }
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName'))]"
+            }
+          ]
+        }
+      },
+      "resources": [
+        {
+          "type": "Microsoft.Compute/virtualMachines/extensions",
+          "name": "[concat(variables('vmName'),'/WinRMCustomScriptExtension')]",
+          "apiVersion": "[variables('apiVersion')]",
+          "location": "[variables('location')]",
+          "dependsOn": [
+            "[concat('Microsoft.Compute/virtualMachines/',variables('vmName'))]"
+          ],
+          "properties": {
+            "publisher": "Microsoft.Compute",
+            "type": "CustomScriptExtension",
+            "typeHandlerVersion": "1.4",
+            "settings": {
+              "fileUris": [
+                "https://raw.githubusercontent.com/sebbrochet/azure-jinja2/master/files/winrm_extension/ConfigureWinRM.ps1",
+                "https://raw.githubusercontent.com/sebbrochet/azure-jinja2/master/files/winrm_extension/makecert.exe",
+                "https://raw.githubusercontent.com/sebbrochet/azure-jinja2/master/files/winrm_extension/winrmconf.cmd"
+              ],
+              "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -file ConfigureWinRM.ps1 ',variables('hostDNSNameScriptArgument'))]"
+            }
+          }
+        }
+      ]
+    }
+  ]
 }
