@@ -158,22 +158,22 @@
         }
     ],
     "variables": {
-        "addressPrefix": "['parameters('vnetAddressPrefix')]",
+        "addressPrefix": "[parameters('vnetAddressPrefix')]",
         "apiVersion": "2015-06-15",
-        "clientRootCertData": "['parameters('clientRootCertData')]",
-        "clientRootCertName": "['parameters('clientRootCertName')]",
-        "gatewayName": "['parameters('gatewayName')]",
-        "gatewaySku": "['parameters('gatewaySku')]",
+        "clientRootCertData": "[parameters('clientRootCertData')]",
+        "clientRootCertName": "[parameters('clientRootCertName')]",
+        "gatewayName": "[parameters('gatewayName')]",
+        "gatewaySku": "[parameters('gatewaySku')]",
         "gatewaySubnetRef": "[concat(variables('vnetID'),'/subnets/','GatewaySubnet')]",
         "location": "[resourceGroup().location]",
-        "publicIPAddressName": "['parameters('gatewayPublicIPName')]",
+        "publicIPAddressName": "[parameters('gatewayPublicIPName')]",
         "publicIPAddressType": "Dynamic",
-        "revokedCertName": "['parameters('revokedCertName')]",
-        "revokedCertThumbprint": "['parameters('revokedCertThumbprint')]",
+        "revokedCertName": "[parameters('revokedCertName')]",
+        "revokedCertThumbprint": "[parameters('revokedCertThumbprint')]",
         "subnetName": "GatewaySubnet",
-        "subnetPrefix": "['parameters('gatewaySubnetPrefix')]",
-        "virtualNetworkName": "['parameters('virtualNetworkName')]",
+        "subnetPrefix": "[parameters('gatewaySubnetPrefix')]",
+        "virtualNetworkName": "[parameters('virtualNetworkName')]",
         "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',variables('virtualNetworkName'))]",
-        "vpnClientAddressPoolPrefix": "['parameters('vpnClientAddressPoolPrefix')]"
+        "vpnClientAddressPoolPrefix": "[parameters('vpnClientAddressPoolPrefix')]"
     }
 }
