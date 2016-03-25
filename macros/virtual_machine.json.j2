@@ -24,9 +24,7 @@
       OSVersion - string
       version - string
       OSDiskName - string
-      withDataDisk - string
-      sizeOfDiskInGB - string
-      dataDisk1VhdName - string
+      dataDisks - array, list of data disk configurations
       extension - object, *virtual machine extension* to add to the VM (see <virtual_machine_extension>)
       withDiagnosticsProfile - string, set to "true" to add the *Diagnostics Profile* to the VM
 
@@ -75,9 +73,7 @@ Example:
    OSVersion,
    version,
    OSDiskName,
-   withDataDisk,
-   sizeOfDiskInGB,
-   dataDisk1VhdName,
+   dataDisks,
    extension,
    withDiagnosticsProfile
 )
@@ -129,19 +125,9 @@ Example:
             "caching": "ReadWrite",
             "createOption": "FromImage"
           }
-	  {% if withDataDisk == "true" %}
+	  {% if dataDisks %}
 	  ,
-          "dataDisks": [
-            {
-              "name": "datadisk1",
-              "diskSizeGB": "{{ sizeOfDiskInGB }}",
-              "lun": 0,
-              "vhd": {
-                "uri": "[concat('http://',{{ storageAccountName }},'.blob.core.windows.net/',{{ vmStorageAccountContainerName }},'/',{{ dataDisk1VhdName }},'.vhd')]"
-              },
-              "createOption": "Empty"
-            }
-          ]
+          "dataDisks": {{ dataDisks }}
 	  {% endif %}
         },
         "networkProfile": {
@@ -242,6 +228,24 @@ Example:
       withDiagnosticsProfile        = "true"
 )
 -%}
+{% if withDataDisk == "true" %}
+{% set _dataDisks %}
+[
+   {
+      "name": "datadisk1",
+      "diskSizeGB": "{{ sizeOfDiskInGB }}",
+      "lun": 0,
+      "vhd": {
+          "uri": "[concat('http://',{{ storageAccountName }},'.blob.core.windows.net/',{{ vmStorageAccountContainerName }},'/',{{ dataDisk1VhdName }},'.vhd')]"
+          },
+      "createOption": "Empty"
+   }
+]
+{% endset %}
+{% else %}
+{% set _dataDisks %}{% endset %}
+{% endif %}
+
 {{ create(
       name                          = name,
       apiVersion                    = apiVersion,
@@ -260,9 +264,7 @@ Example:
       OSVersion                     = OSVersion,
       version                       = version,
       OSDiskName                    = OSDiskName,
-      withDataDisk                  = withDataDisk,
-      sizeOfDiskInGB                = sizeOfDiskInGB,
-      dataDisk1VhdName              = dataDisk1VhdName,
+      dataDisks                     = _dataDisks,
       extension                     = extension,
       withDiagnosticsProfile        = withDiagnosticsProfile
    )
