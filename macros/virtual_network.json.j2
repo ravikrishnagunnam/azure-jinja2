@@ -3,6 +3,47 @@
    TODO: support several subnets instead of 1
 #}
 
+{#
+   package: virtual_network
+   source: https://github.com/sebbrochet/azure-jinja2/blob/master/macros/virtual_network.json.j2
+
+   macro: create
+   Create a virtual network (VNET).
+
+   Parameters:
+
+      name - string
+      apiVersion - string
+      location - string
+      addressPrefix - string, virtual network range in CIDR notation (ex: "10.0.0.0/16")
+      subnetName - string
+      subnetPrefix - string, subnet range in CIDR notation (ex: "10.0.0.0/24"), *must* be included inside *addressPrefix*
+
+   Example:
+(start code)
+{% import 'azure-jinja2/macros/virtual_network.json.j2' as virtual_network %}
+
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "resources" : [
+    {{ virtual_network.create(
+         name = "myVNET",
+         apiVersion = "2015-06-15",
+         location = "westeurope",
+         addressPrefix = "10.0.0.0/16",
+         subnetName = "mySubnet",
+         subnetPrefix = "10.0.0.0/24" 
+       )
+    }}
+  ]
+}
+
+(end)
+
+
+#}
+
 
 {% macro create(
       name,
@@ -35,6 +76,45 @@
    }
 }
 {%- endmacro %}
+
+{#
+   macro: from_vars
+   Create a virtual network (VNET) from variables.
+
+   Parameters:
+
+      name - string = "[variables('virtualNetworkName')]"
+      apiVersion - string = "[variables('apiVersion')]"
+      location - string = "[variables('location')]"
+      addressPrefix - string = "[variables('addressPrefix')]", virtual network range in CIDR notation (ex: "10.0.0.0/16")
+      subnetName - string = "[variables('subnetName')]"
+      subnetPrefix - string = "[variables('subnetPrefix')]", subnet range in CIDR notation (ex: "10.0.0.0/24"), *must* be included inside *addressPrefix*
+
+   Example:
+(start code)
+{% import 'azure-jinja2/macros/virtual_network.json.j2' as virtual_network %}
+
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "variables": {
+    "apiVersion": "2015-06-15"
+    "location": "[resourceGroup().location]",
+    "virtualNetworkName": "MyVNET",
+    "addressPrefix": "10.0.0.0/16",
+    "subnetName": "Subnet",
+    "subnetPrefix": "10.0.0.0/24",
+  },
+
+  "resources" : [
+    {{ virtual_network.ifrom_vars() }}
+  ]
+}
+
+(end)
+
+
+#}
 
 {% macro from_vars(
       name          = "[variables('virtualNetworkName')]",

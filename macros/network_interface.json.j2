@@ -1,3 +1,50 @@
+{#
+   package: network_interface
+   source: https://github.com/sebbrochet/azure-jinja2/blob/master/macros/network_interface.json.j2
+
+   macro: create
+   Create a Network interface.
+
+   A network interface has be attached to a *subnet* of an existing *virtual network* (VNET)
+
+   Parameters:
+
+      name - string
+      apiVersion - string
+      location - string
+      virtualNetworkName - string, name of an existing VNET
+      subnetName - string, name of a subnet of an existing VNET
+      publicIPAddressName - string (optional)
+      networkSecurityGroupName - string (optional)
+
+Example:
+(start code)
+{% import 'azure-jinja2/macros/network_interface.json.j2' as network_interface %}
+
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "variables": {
+    ... 
+  },
+  "resources" : [
+    ...,
+    {{ network_interface.from_vars(
+          name = "myVMNic",
+          apiVersion = "2015-06-15",
+          location = "westeurope",
+          virtualNetworkName = "MyVNet",
+          subnetName = "Subnet"
+       ) 
+    }}
+  ]
+}
+
+(end)
+
+#}
+
+
 {% macro create
 (
    name,
@@ -50,16 +97,59 @@
 }
 {%- endmacro %}
 
+{#
+   macro: from_vars
+   Create a Network interface with JSON variables.
+
+   Parameters:
+
+      name - string = "[variables('nicName')]"
+      apiVersion - string = "[variables('apiVersion')]"
+      location - string = "[variables('location')]"
+      virtualNetworkName - string = "variables('virtualNetworkName')"
+      subnetName - string = "variables('subnetName')"
+      withPublicIP - string = "false", set to "true" if you want to use the *publicIPAddressName* parameter
+      publicIPAddressName - string = "variables('publicIPAddressName')"
+      withNSG - string = "false", set to "true" if you want to use the *networkSecurityGroupName* parameter
+      networkSecurityGroupName - string = "variables('networkSecurityGroupName')"
+
+   Example:
+(start code)
+{% import 'azure-jinja2/macros/virtual_network.json.j2' as virtual_network %}
+{% import 'azure-jinja2/macros/network_interface.json.j2' as network_interface %}
+
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "variables": {
+    "nicName": "myVMNic",
+    "apiVersion": "2015-06-15"
+    "location": "[resourceGroup().location]",
+    "virtualNetworkName": "MyVNET",
+    "addressPrefix": "10.0.0.0/16",
+    "subnetName": "Subnet",
+    "subnetPrefix": "10.0.0.0/24",
+  },
+  "resources" : [
+    {{ virtual_network.from_vars() }},
+    {{ network_interface.from_vars() }}
+  ]
+}
+
+(end)
+
+#}
+
 {% macro from_vars(
       name                     = "[variables('nicName')]",
       apiVersion               = "[variables('apiVersion')]",
       location                 = "[variables('location')]",
+      virtualNetworkName       = "variables('virtualNetworkName')",
+      subnetName               = "variables('subnetName')"
       withPublicIP             = "false",
       publicIPAddressName      = "variables('publicIPAddressName')",
-      virtualNetworkName       = "variables('virtualNetworkName')",
       withNSG                  = "false",
       networkSecurityGroupName = "variables('networkSecurityGroupName')",
-      subnetName               = "variables('subnetName')"
 )
 -%}
 {% if withPublicIP != "false" %}
