@@ -1,3 +1,40 @@
+{#
+   package: security_rules
+   source: https://github.com/sebbrochet/azure-jinja2/blob/master/macros/security_rules.json.j2
+
+   macro: create
+   Create a new *security rule*.
+
+   Parameters:
+
+      name - string
+      port - string
+      priority - integer
+      protocol - string = "*"
+      sourcePortRange - string = "*"
+      sourceAddressPrefix - string = "*"
+      destinationAddressPrefix - string = "*"
+      access - string - string = "Allow"
+      direction - string = "Inbound"
+
+   Example:
+(start code)
+{% import 'azure-jinja2/macros/security_rules.json.j2' as security_rules %}
+
+{% set SSH_rule %}
+{{ security_rules.create(
+     name = "SSH",
+     port = "22",
+     priority = 1020
+   )
+}}
+{% endset %}
+
+(end)
+
+
+#}
+
 {% macro create(
       name,
       port,
@@ -25,6 +62,20 @@
 }
 {%- endmacro %}
 
+{#
+   macro: SSH
+   Create a new *security rule* for the SSH protocol (port 22).
+
+   Example:
+(start code)
+{% import 'azure-jinja2/macros/security_rules.json.j2' as security_rules %}
+
+{% set SSH_rule %}{{ security_rules.SSH() }}{% endset %}
+
+(end)
+
+#}
+
 {% macro SSH() -%}
 {{ create(
      name = "SSH",
@@ -34,6 +85,20 @@
 }}
 {%- endmacro %}
 
+{#
+   macro: RDP
+   Create a new *security rule* for the RDP protocol (port 389).
+
+   Example:
+(start code)
+{% import 'azure-jinja2/macros/security_rules.json.j2' as security_rules %}
+
+{% set RDP_rule %}{{ security_rules.RDP() }}{% endset %}
+
+(end)
+
+#}
+
 {% macro RDP() -%}
 {{ create(
      name = "SSH",
@@ -42,6 +107,20 @@
    )
 }}
 {%- endmacro %}
+
+{#
+   macro: HTTP
+   Create a new *security rule* for the HTTP protocol (port 80).
+
+   Example:
+(start code)
+{% import 'azure-jinja2/macros/security_rules.json.j2' as security_rules %}
+
+{% set HTTP_rule %}{{ security_rules.HTTP() }}{% endset %}
+
+(end)
+
+#}
 
 {% macro HTTP() -%}
 {{ create(
@@ -53,6 +132,20 @@
 
 {%- endmacro %}
 
+{#
+   macro: HTTPS
+   Create a new *security rule* for the HTTPS protocol (port 443).
+
+   Example:
+(start code)
+{% import 'azure-jinja2/macros/security_rules.json.j2' as security_rules %}
+
+{% set HTTPS_rule %}{{ security_rules.HTTPS() }}{% endset %}
+
+(end)
+
+#}
+
 {% macro HTTPS() -%}
 {{ create(
      name = "HTTPS",
@@ -62,6 +155,20 @@
 }}
 {%- endmacro %}
 
+{#
+   macro: WINRM_HTTP 
+   Create a new *security rule* for the WinRM on HTTP protocol (port 5985).
+
+   Example:
+(start code)
+{% import 'azure-jinja2/macros/security_rules.json.j2' as security_rules %}
+
+{% set WINRM_HTTP_rule %}{{ security_rules.WINRM_HTTP() }}{% endset %}
+
+(end)
+
+#}
+
 {% macro WINRM_HTTP() -%}
 {{ create(
      name = "WINRM_HTTP",
@@ -70,6 +177,20 @@
    )
 }}
 {%- endmacro %}
+
+{#
+   macro: WINRM_HTTPS 
+   Create a new *security rule* for the WinRM on HTTPS protocol (port 5986).
+
+   Example:
+(start code)
+{% import 'azure-jinja2/macros/security_rules.json.j2' as security_rules %}
+
+{% set WINRM_HTTPS_rule %}{{ security_rules.WINRM_HTTPS() }}{% endset %}
+
+(end)
+
+#}
 
 {% macro WINRM_HTTPS() -%}
 {{ create(

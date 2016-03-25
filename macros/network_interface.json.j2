@@ -3,9 +3,9 @@
    source: https://github.com/sebbrochet/azure-jinja2/blob/master/macros/network_interface.json.j2
 
    macro: create
-   Create a Network interface.
+   Create a new *network interface*.
 
-   A network interface has be attached to a *subnet* of an existing *virtual network* (VNET)
+   A network interface has to be attached to a *subnet* of an existing *virtual network* (see <virtual_network>)
 
    Parameters:
 
@@ -29,7 +29,7 @@ Example:
   },
   "resources" : [
     ...,
-    {{ network_interface.from_vars(
+    {{ network_interface.create(
           name = "myVMNic",
           apiVersion = "2015-06-15",
           location = "westeurope",
@@ -99,7 +99,7 @@ Example:
 
 {#
    macro: from_vars
-   Create a Network interface with JSON variables.
+   Create a new *network interface* from JSON variables.
 
    Parameters:
 

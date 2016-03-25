@@ -1,3 +1,61 @@
+{#
+   package: virtual_machine
+   source: https://github.com/sebbrochet/azure-jinja2/blob/master/macros/virtual_machine.json.j2
+
+   macro: create
+   Create a new *virtual machine*.
+
+   Parameters:
+
+      name - string
+      apiVersion - string
+      location - string
+      storageAccountName - string
+      vmStorageAccountContainerName - string, name of an existing *storage account* (see <storage_account>)
+      nicName - string, name of an existing *network interface* (see <network_interface>)
+      vmSize - string
+      adminUsername - string
+      adminPassword - string
+      withSSHKey - string
+      sshKeyData - string
+      sshKeyPath - string
+      imagePublisher - string
+      imageOffer - string
+      OSVersion - string
+      version - string
+      OSDiskName - string
+      withDataDisk - string
+      sizeOfDiskInGB - string
+      dataDisk1VhdName - string
+      extension - object, *virtual machine extension* to add to the VM (see <virtual_machine_extension>)
+      withDiagnosticsProfile - string, set to "true" to add the *Diagnostics Profile* to the VM
+
+Example:
+(start code)
+{% import 'azure-jinja2/macros/network_interface.json.j2' as virtual_machine %}
+
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "variables": {
+    ...
+  },
+  "resources" : [
+    ...,
+    {{ virtual_machine.create(
+          name = "myVM",
+          apiVersion = "2015-06-15",
+          location = "westeurope",
+          ...
+       )
+    }}
+  ]
+}
+
+(end)
+
+#}
+
 {% macro create
 (
    name,
@@ -111,6 +169,53 @@
       {% endif %}
 }
 {%- endmacro %}
+
+{#
+   macro: from_vars
+   Create a new *virtual machine* from variables.
+
+   Parameters:
+
+      name - string
+      apiVersion - string
+      location - string
+      storageAccountName - string
+      vmStorageAccountContainerName - string
+      nicName - string
+      vmSize - string
+      adminUsername - string
+      adminPassword - string
+      withSSHKey - string
+      sshKeyData - string
+      sshKeyPath - string
+      imagePublisher - string
+      imageOffer - string
+      OSVersion - string
+      version - string
+      OSDiskName - string
+      withDataDisk - string
+      sizeOfDiskInGB - string
+      dataDisk1VhdName - string
+      extension - object
+      withDiagnosticsProfile - string
+
+Example:
+(start code)
+{% import 'azure-jinja2/macros/network_interface.json.j2' as virtual_machine %}
+
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "variables": {
+    ...
+  },
+  "resources" : [
+    ...,
+    {{ virtual_machine.from_vars() }}
+  ]
+}
+
+#}
 
 {% macro from_vars(
       name                          = "[variables('vmName')]",
