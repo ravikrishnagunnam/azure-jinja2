@@ -145,11 +145,11 @@ Example:
       apiVersion               = "[variables('apiVersion')]",
       location                 = "[variables('location')]",
       virtualNetworkName       = "variables('virtualNetworkName')",
-      subnetName               = "variables('subnetName')"
+      subnetName               = "variables('subnetName')",
       withPublicIP             = "false",
       publicIPAddressName      = "variables('publicIPAddressName')",
       withNSG                  = "false",
-      networkSecurityGroupName = "variables('networkSecurityGroupName')",
+      networkSecurityGroupName = "variables('networkSecurityGroupName')"
 )
 -%}
 {% if withPublicIP != "false" %}
