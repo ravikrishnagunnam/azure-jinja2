@@ -1,3 +1,46 @@
+{#
+   package: storage_account
+   source: https://github.com/sebbrochet/azure-jinja2/blob/master/macros/storage_account.json.j2
+
+   macro: create
+   Create a new *storage account*.
+
+   Parameters:
+
+      name - string
+      apiVersion - string
+      location - string
+      type - string, type of replication, *"Standard_LRS""* or *"Standard_ZRS"* or *"Standard_GRS"* or *"Standard_RAGRS"* or *"Premium_LRS"*
+
+      * Standard_LRS (Standard Locally-redundant storage)
+      * Standard_ZRS (Standard Zone-redundant storage)
+      * Standard_GRS (Standard Geo-redundant storage)
+      * Standard_RAGRS (Standard Read access geo-redundant storage)
+      * Premium_LRS (Premium Locally-redundant storage) 
+
+   Example:
+(start code)
+{% import 'azure-jinja2/macros/storage_account.json.j2' as storage_account %}
+
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "resources" : [
+    {{ storage_account.create(
+         name = "mySA",
+         apiVersion = "2015-06-15",
+         location = "westeurope",
+         type = "Standard_LRS"
+       )
+    }}
+  ]
+}
+
+(end)
+
+
+#}
+
 {% macro create(name,
                 apiVersion,
                 location,
@@ -13,6 +56,46 @@
    }
 }
 {%- endmacro %}
+
+{#
+   macro: from_vars
+   Create a new *storage account* from variables.
+
+   Parameters:
+
+      name - string = "[variables('storageAccountName')]"
+      apiVersion - string = "[variables('apiVersion')]"
+      location - string = "[variables('location')]"
+      type - string = "[variables('storageAccountType')]", type of replication, *"Standard_LRS""* or *"Standard_ZRS"* or *"Standard_GRS"* or *"Standard_RAGRS"* or *"Premium_LRS"*
+
+      * Standard_LRS (Standard Locally-redundant storage)
+      * Standard_ZRS (Standard Zone-redundant storage)
+      * Standard_GRS (Standard Geo-redundant storage)
+      * Standard_RAGRS (Standard Read access geo-redundant storage)
+      * Premium_LRS (Premium Locally-redundant storage)
+
+   Example:
+(start code)
+{% import 'azure-jinja2/macros/storage_account.json.j2' as storage_account %}
+
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "variables": {
+    "storageAccountName": "[concat(uniquestring(resourceGroup().id), 'salinuxvm')]",
+    "location": "[resourceGroup().location]",
+    "storageAccountType": "Standard_LRS",
+    "apiVersion": "2015-06-15"
+  },
+  "resources" : [
+    {{ storage_account.from_vars() }}
+  ]
+}
+
+(end)
+
+
+#}
 
 {% macro from_vars(
       name       = "[variables('storageAccountName')]",
