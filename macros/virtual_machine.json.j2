@@ -185,7 +185,7 @@ Example:
 
 Example:
 (start code)
-{% import 'azure-jinja2/macros/network_interface.json.j2' as virtual_machine %}
+{% import 'azure-jinja2/macros/virtual_machine.json.j2' as virtual_machine %}
 
 {
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
@@ -227,17 +227,23 @@ Example:
 )
 -%}
 {% if withDataDisk == "true" %}
+{% import 'azure-jinja2/macros/virtual_machine_data_disk.json.j2' as vm_data_disk %}
+
+{% set _storageAccountName %}{{ storageAccountName }}{% endset %}
+{% set _vmStorageAccountContainerName %}{{ vmStorageAccountContainerName }}{% endset %}
+{% set _sizeOfDiskInGB %}{{ sizeOfDiskInGB }}{% endset %}
+{% set _dataDisk1VhdName %}{{ dataDisk1VhdName }}{% endset %}
+
 {% set _dataDisks %}
 [
-   {
-      "name": "datadisk1",
-      "diskSizeGB": "{{ sizeOfDiskInGB }}",
-      "lun": 0,
-      "vhd": {
-          "uri": "[concat('http://',{{ storageAccountName }},'.blob.core.windows.net/',{{ vmStorageAccountContainerName }},'/',{{ dataDisk1VhdName }},'.vhd')]"
-          },
-      "createOption": "Empty"
-   }
+   {{ vm_data_disk.create(
+         name = "datadisk1",
+         storageAccountName = _storageAccountName,
+         vmStorageAccountContainerName = _vmStorageAccountContainerName,
+         sizeOfDiskInGB = _sizeOfDiskInGB,
+         dataDiskVhdName = _dataDisk1VhdName
+      )
+   }}
 ]
 {% endset %}
 {% else %}
