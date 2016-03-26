@@ -25,7 +25,7 @@
       version - string
       OSDiskName - string
       dataDisks - array, list of data disk configurations
-      extension - object, *virtual machine extension* to add to the VM (see <virtual_machine_extension>)
+      extensions - array, list of *virtual machine extension* to add to the VM (see <virtual_machine_extension>)
       withDiagnosticsProfile - string, set to "true" to add the *Diagnostics Profile* to the VM
 
 Example:
@@ -74,7 +74,7 @@ Example:
    version,
    OSDiskName,
    dataDisks,
-   extension,
+   extensions,
    withDiagnosticsProfile
 )
 -%}
@@ -147,11 +147,9 @@ Example:
         }
 	{% endif %}
       }
-      {% if extension %}
+      {% if extensions %}
       ,
-      "resources" : [
-         {{ extension }}
-      ]
+      "resources" : {{ extensions }}
       {% endif %}
 }
 {%- endmacro %}
@@ -245,6 +243,15 @@ Example:
 {% else %}
 {% set _dataDisks %}{% endset %}
 {% endif %}
+{% if extension %}
+{% set _extensions %}
+[
+   {{ extension }}
+]
+{% endset %}
+{% else %}
+{% set _extensions %}{% endset %}
+{% endif %}
 
 {{ create(
       name                          = name,
@@ -265,7 +272,7 @@ Example:
       version                       = version,
       OSDiskName                    = OSDiskName,
       dataDisks                     = _dataDisks,
-      extension                     = extension,
+      extensions                    = _extensions,
       withDiagnosticsProfile        = withDiagnosticsProfile
    )
 }}
