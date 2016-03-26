@@ -27,6 +27,7 @@
       dataDisks - array, list of data disk configurations
       extensions - array, list of *virtual machine extension* to add to the VM (see <virtual_machine_extension>)
       withDiagnosticsProfile - string, set to "true" to add the *Diagnostics Profile* to the VM
+      customData - string (optional), base64-encoded custom data for the OS Profile
 
 Example:
 (start code)
@@ -75,7 +76,8 @@ Example:
    OSDiskName,
    dataDisks,
    extensions,
-   withDiagnosticsProfile
+   withDiagnosticsProfile,
+   customData = ""
 )
 -%}
 {
@@ -109,6 +111,10 @@ Example:
 	  {% else %}
           "adminPassword": "{{ adminPassword }}"
 	  {% endif %}
+          {% if customData %}
+          ,
+          "customData" : "{{ customData }}"
+          {% endif %}
         },
         "storageProfile": {
           "imageReference": {
