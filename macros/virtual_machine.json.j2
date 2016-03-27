@@ -24,7 +24,7 @@
       OSVersion - string
       version - string
       OSDiskName - string
-      dataDisks - array, list of data disk configurations
+      dataDisks - array, list of data disk configurations (see <virtual_machine/data_disk>)
       extensions - array, list of *virtual machine extension* to add to the VM (see <virtual_machine_extension>)
       withDiagnosticsProfile - string, set to "true" to add the *Diagnostics Profile* to the VM
       customData - string (optional), base64-encoded custom data for the OS Profile
@@ -233,7 +233,7 @@ Example:
 )
 -%}
 {% if withDataDisk == "true" %}
-{% import 'azure-jinja2/macros/virtual_machine_data_disk.json.j2' as vm_data_disk %}
+{% import 'azure-jinja2/macros/virtual_machine/data_disk.json.j2' as vm_data_disk %}
 
 {% set _storageAccountName %}{{ storageAccountName }}{% endset %}
 {% set _vmStorageAccountContainerName %}{{ vmStorageAccountContainerName }}{% endset %}

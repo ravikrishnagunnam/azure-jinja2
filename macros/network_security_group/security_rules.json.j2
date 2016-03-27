@@ -1,9 +1,9 @@
 {#
-   package: security_rules
-   source: https://github.com/sebbrochet/azure-jinja2/blob/master/macros/security_rules.json.j2
+   package: network_security_group/security_rules
+   source: https://github.com/sebbrochet/azure-jinja2/blob/master/macros/network_security_group/security_rules.json.j2
 
    macro: create
-   Create a new *security rule*.
+   Create a new *security rule* for a *network security group* (see <network_security_group>).
 
    Parameters:
 
@@ -19,7 +19,7 @@
 
    Example:
 (start code)
-{% import 'azure-jinja2/macros/security_rules.json.j2' as security_rules %}
+{% import 'azure-jinja2/macros/network_security_group/security_rules.json.j2' as security_rules %}
 
 {% set SSH_rule %}
 {{ security_rules.create(
