@@ -14,11 +14,7 @@
       vmStorageAccountContainerName - string, name of an existing *storage account* (see <storage_account>)
       nicName - string, name of an existing *network interface* (see <network_interface>)
       vmSize - string
-      adminUsername - string
-      adminPassword - string
-      withSSHKey - string
-      sshKeyData - string
-      sshKeyPath - string
+      os_profile - object, *os profile* (see <virtual_machine/os_profile>)
       imagePublisher - string
       imageOffer - string
       OSVersion - string
@@ -27,7 +23,6 @@
       dataDisks - array, list of data disk configurations (see <virtual_machine/data_disk>)
       extensions - array, list of *virtual machine extension* to add to the VM (see <virtual_machine_extension>)
       withDiagnosticsProfile - string, set to "true" to add the *Diagnostics Profile* to the VM
-      customData - string (optional), base64-encoded custom data for the OS Profile
 
 Example:
 (start code)
@@ -64,11 +59,7 @@ Example:
    vmStorageAccountContainerName,
    nicName,
    vmSize,
-   adminUsername,
-   adminPassword,
-   withSSHKey,
-   sshKeyData,
-   sshKeyPath,
+   os_profile,
    imagePublisher,
    imageOffer,
    OSVersion,
@@ -76,8 +67,7 @@ Example:
    OSDiskName,
    dataDisks,
    extensions,
-   withDiagnosticsProfile,
-   customData = ""
+   withDiagnosticsProfile
 )
 -%}
 {
@@ -93,29 +83,7 @@ Example:
         "hardwareProfile": {
           "vmSize": "{{ vmSize }}"
         },
-        "osProfile": {
-          "computerName": "{{ name }}",
-          "adminUsername": "{{ adminUsername }}",
-	  {% if withSSHKey != "false" %}
-          "linuxConfiguration": {
-            "disablePasswordAuthentication": "true",
-            "ssh": {
-              "publicKeys": [
-                {
-                  "path": "{{ sshKeyPath }}",
-                  "keyData": "{{ sshKeyData }}"
-                }
-              ]
-            }
-          }
-	  {% else %}
-          "adminPassword": "{{ adminPassword }}"
-	  {% endif %}
-          {% if customData %}
-          ,
-          "customData" : "{{ customData }}"
-          {% endif %}
-        },
+        "osProfile": {{ os_profile }},
         "storageProfile": {
           "imageReference": {
             "publisher": "{{ imagePublisher }}",
@@ -232,22 +200,38 @@ Example:
       withDiagnosticsProfile        = "true"
 )
 -%}
+{% import 'azure-jinja2/macros/virtual_machine/os_profile.json.j2' as vm_os_profile %}
+
+{% if withSSHKey != "false" %}
+{% set _sshKeyData %}{{ sshKeyData }}{% endset %}
+{% set _sshKeyPath %}{{ sshKeyPath }}{% endset %}
+{% else %}
+{% set _sshKeyData %}{% endset %}
+{% set _sshKeyPath %}{% endset %}
+{% endif %}
+
+{% set _os_profile %}
+{{ vm_os_profile.create(
+      name = name,
+      adminUsername = adminUsername,
+      adminPassword = adminPassword,
+      sshKeyData = _sshKeyData,
+      sshKeyPath = _sshKeyPath
+   )
+}}
+{% endset %}
+
 {% if withDataDisk == "true" %}
 {% import 'azure-jinja2/macros/virtual_machine/data_disk.json.j2' as vm_data_disk %}
-
-{% set _storageAccountName %}{{ storageAccountName }}{% endset %}
-{% set _vmStorageAccountContainerName %}{{ vmStorageAccountContainerName }}{% endset %}
-{% set _sizeOfDiskInGB %}{{ sizeOfDiskInGB }}{% endset %}
-{% set _dataDisk1VhdName %}{{ dataDisk1VhdName }}{% endset %}
 
 {% set _dataDisks %}
 [
    {{ vm_data_disk.create(
          name = "datadisk1",
-         storageAccountName = _storageAccountName,
-         vmStorageAccountContainerName = _vmStorageAccountContainerName,
-         sizeOfDiskInGB = _sizeOfDiskInGB,
-         dataDiskVhdName = _dataDisk1VhdName
+         storageAccountName = storageAccountName,
+         vmStorageAccountContainerName = vmStorageAccountContainerName,
+         sizeOfDiskInGB = sizeOfDiskInGB,
+         dataDiskVhdName = dataDisk1VhdName
       )
    }}
 ]
@@ -255,6 +239,7 @@ Example:
 {% else %}
 {% set _dataDisks %}{% endset %}
 {% endif %}
+
 {% if extension %}
 {% set _extensions %}
 [
@@ -273,11 +258,7 @@ Example:
       vmStorageAccountContainerName = vmStorageAccountContainerName,
       nicName                       = nicName,
       vmSize                        = vmSize,
-      adminUsername                 = adminUsername,
-      adminPassword                 = adminPassword,
-      withSSHKey                     = withSSHKey,
-      sshKeyData                    = sshKeyData,
-      sshKeyPath                    = sshKeyPath,
+      os_profile                    = _os_profile,
       imagePublisher                = imagePublisher,
       imageOffer                    = imageOffer,
       OSVersion                     = OSVersion,
