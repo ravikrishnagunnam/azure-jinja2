@@ -19,7 +19,9 @@ Example:
 #}
 
 {% macro create() %}
-"https://raw.githubusercontent.com/sebbrochet/azure-jinja2/master/files/winrm_extension/ConfigureWinRM.ps1",
-"https://raw.githubusercontent.com/sebbrochet/azure-jinja2/master/files/winrm_extension/makecert.exe",
-"https://raw.githubusercontent.com/sebbrochet/azure-jinja2/master/files/winrm_extension/winrmconf.cmd"
+[
+   "https://raw.githubusercontent.com/sebbrochet/azure-jinja2/master/files/winrm_extension/ConfigureWinRM.ps1",
+   "https://raw.githubusercontent.com/sebbrochet/azure-jinja2/master/files/winrm_extension/makecert.exe",
+   "https://raw.githubusercontent.com/sebbrochet/azure-jinja2/master/files/winrm_extension/winrmconf.cmd"
+]
 {% endmacro %}

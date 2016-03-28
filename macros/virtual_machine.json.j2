@@ -11,22 +11,13 @@
       apiVersion - string
       location - string
       storageAccountName - string
-      vmStorageAccountContainerName - string, name of an existing *storage account* (see <storage_account>)
       nicName - string, name of an existing *network interface* (see <network_interface>)
-      vmSize - string
-      adminUsername - string
-      adminPassword - string
-      withSSHKey - string
-      sshKeyData - string
-      sshKeyPath - string
-      imagePublisher - string
-      imageOffer - string
-      OSVersion - string
-      version - string
-      OSDiskName - string
-      dataDisks - array, list of data disk configurations
-      extension - object, *virtual machine extension* to add to the VM (see <virtual_machine_extension>)
-      withDiagnosticsProfile - string, set to "true" to add the *Diagnostics Profile* to the VM
+      hardware_profile - object, "*hardware profile* (see <virtual_machine/hardware_profile>)
+      os_profile - object, *os profile* (see <virtual_machine/os_profile>)
+      storage_profile - object, *storage profile* (see <virtual_machine/storage_profile>)
+      network_profile - object, *network_profile* (see <virtual_machine/network_profile>) 
+      diagnostics_profile - object, *diagnostics profile* (see <virtual_machine/diagnostics_profile>)
+      extensions - array, list of *virtual machine extension* to add to the VM (see <virtual_machine_extension>)
 
 Example:
 (start code)
@@ -60,22 +51,13 @@ Example:
    apiVersion,
    location,
    storageAccountName,
-   vmStorageAccountContainerName,
    nicName,
-   vmSize,
-   adminUsername,
-   adminPassword,
-   withSSHKey,
-   sshKeyData,
-   sshKeyPath,
-   imagePublisher,
-   imageOffer,
-   OSVersion,
-   version,
-   OSDiskName,
-   dataDisks,
-   extension,
-   withDiagnosticsProfile
+   hardware_profile,
+   os_profile,
+   storage_profile,
+   network_profile,
+   diagnostics_profile,
+   extensions
 )
 -%}
 {
@@ -88,70 +70,18 @@ Example:
         "[concat('Microsoft.Network/networkInterfaces/',{{ nicName }})]"
       ],
       "properties": {
-        "hardwareProfile": {
-          "vmSize": "{{ vmSize }}"
-        },
-        "osProfile": {
-          "computerName": "{{ name }}",
-          "adminUsername": "{{ adminUsername }}",
-	  {% if withSSHKey != "false" %}
-          "linuxConfiguration": {
-            "disablePasswordAuthentication": "true",
-            "ssh": {
-              "publicKeys": [
-                {
-                  "path": "{{ sshKeyPath }}",
-                  "keyData": "{{ sshKeyData }}"
-                }
-              ]
-            }
-          }
-	  {% else %}
-          "adminPassword": "{{ adminPassword }}"
-	  {% endif %}
-        },
-        "storageProfile": {
-          "imageReference": {
-            "publisher": "{{ imagePublisher }}",
-            "offer": "{{ imageOffer }}",
-            "sku": "{{ OSVersion }}",
-            "version": "{{ version }}"
-          },
-          "osDisk": {
-            "name": "osdisk",
-            "vhd": {
-              "uri": "[concat('http://',{{ storageAccountName }},'.blob.core.windows.net/',{{  vmStorageAccountContainerName }},'/',{{ OSDiskName }},'.vhd')]"
-            },
-            "caching": "ReadWrite",
-            "createOption": "FromImage"
-          }
-	  {% if dataDisks %}
-	  ,
-          "dataDisks": {{ dataDisks }}
-	  {% endif %}
-        },
-        "networkProfile": {
-          "networkInterfaces": [
-            {
-              "id": "[resourceId('Microsoft.Network/networkInterfaces',{{ nicName }})]"
-            }
-          ]
-        }
-	{% if withDiagnosticsProfile == "true" %}
+        "hardwareProfile": {{ hardware_profile }},
+        "osProfile": {{ os_profile }},
+        "storageProfile": {{ storage_profile }},
+        "networkProfile":{{ network_profile }} 
+	{% if diagnostics_profile %}
 	,
-        "diagnosticsProfile": {
-          "bootDiagnostics": {
-            "enabled": "true",
-            "storageUri": "[concat('http://',{{ storageAccountName }},'.blob.core.windows.net')]"
-          }
-        }
+        "diagnosticsProfile": {{ diagnostics_profile }}
 	{% endif %}
       }
-      {% if extension %}
+      {% if extensions %}
       ,
-      "resources" : [
-         {{ extension }}
-      ]
+      "resources" : {{ extensions }}
       {% endif %}
 }
 {%- endmacro %}
@@ -187,7 +117,7 @@ Example:
 
 Example:
 (start code)
-{% import 'azure-jinja2/macros/network_interface.json.j2' as virtual_machine %}
+{% import 'azure-jinja2/macros/virtual_machine.json.j2' as virtual_machine %}
 
 {
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
@@ -228,45 +158,107 @@ Example:
       withDiagnosticsProfile        = "true"
 )
 -%}
+{% import 'azure-jinja2/macros/virtual_machine/hardware_profile.json.j2' as vm_hw_profile %}
+{% set _hardware_profile %}
+{{ vm_hw_profile.create(vmSize = vmSize)}}
+{% endset %}
+
+{% import 'azure-jinja2/macros/virtual_machine/os_profile.json.j2' as vm_os_profile %}
+
+{% if withSSHKey != "false" %}
+{% set _sshKeyData %}{{ sshKeyData }}{% endset %}
+{% set _sshKeyPath %}{{ sshKeyPath }}{% endset %}
+{% else %}
+{% set _sshKeyData %}{% endset %}
+{% set _sshKeyPath %}{% endset %}
+{% endif %}
+
+{% set _os_profile %}
+{{ vm_os_profile.create(
+      name = name,
+      adminUsername = adminUsername,
+      adminPassword = adminPassword,
+      sshKeyData = _sshKeyData,
+      sshKeyPath = _sshKeyPath
+   )
+}}
+{% endset %}
+
 {% if withDataDisk == "true" %}
+{% import 'azure-jinja2/macros/virtual_machine/data_disk.json.j2' as vm_data_disk %}
+
 {% set _dataDisks %}
 [
-   {
-      "name": "datadisk1",
-      "diskSizeGB": "{{ sizeOfDiskInGB }}",
-      "lun": 0,
-      "vhd": {
-          "uri": "[concat('http://',{{ storageAccountName }},'.blob.core.windows.net/',{{ vmStorageAccountContainerName }},'/',{{ dataDisk1VhdName }},'.vhd')]"
-          },
-      "createOption": "Empty"
-   }
+   {{ vm_data_disk.create(
+         name = "datadisk1",
+         storageAccountName = storageAccountName,
+         vmStorageAccountContainerName = vmStorageAccountContainerName,
+         sizeOfDiskInGB = sizeOfDiskInGB,
+         dataDiskVhdName = dataDisk1VhdName
+      )
+   }}
 ]
 {% endset %}
 {% else %}
 {% set _dataDisks %}{% endset %}
 {% endif %}
 
-{{ create(
-      name                          = name,
-      apiVersion                    = apiVersion,
-      location                      = location,
-      storageAccountName            = storageAccountName,
+
+{% import 'azure-jinja2/macros/virtual_machine/storage_profile.json.j2' as vm_storage_profile %}
+
+{% set _storage_profile %}
+{{ vm_storage_profile.create(
+      storageAccountName = storageAccountName,
       vmStorageAccountContainerName = vmStorageAccountContainerName,
-      nicName                       = nicName,
-      vmSize                        = vmSize,
-      adminUsername                 = adminUsername,
-      adminPassword                 = adminPassword,
-      withSSHKey                     = withSSHKey,
-      sshKeyData                    = sshKeyData,
-      sshKeyPath                    = sshKeyPath,
-      imagePublisher                = imagePublisher,
-      imageOffer                    = imageOffer,
-      OSVersion                     = OSVersion,
-      version                       = version,
-      OSDiskName                    = OSDiskName,
-      dataDisks                     = _dataDisks,
-      extension                     = extension,
-      withDiagnosticsProfile        = withDiagnosticsProfile
+      imagePublisher = imagePublisher,
+      imageOffer= imageOffer,
+      OSVersion = OSVersion,
+      version = version,
+      OSDiskName = OSDiskName,
+      dataDisks = _dataDisks
+   )
+}}
+{% endset %}
+
+{% import 'azure-jinja2/macros/virtual_machine/network_profile.json.j2' as vm_network_profile %}
+
+{% set _network_profile %}
+{{ vm_network_profile.create(
+      nicName = nicName
+   )
+}}
+{% endset %}
+
+{% import 'azure-jinja2/macros/virtual_machine/diagnostics_profile.json.j2' as vm_diag_profile %}
+
+{% if withDiagnosticsProfile == "true" %}
+{% set _diagnostics_profile %}{{ vm_diag_profile.create(storageAccountName = storageAccountName) }}{% endset %}
+{% else %}
+{% set _diagnostics_profile %}{% endset %}
+{% endif %}
+ 
+{% if extension %}
+{% set _extensions %}
+[
+   {{ extension }}
+]
+{% endset %}
+{% else %}
+{% set _extensions %}{% endset %}
+{% endif %}
+
+{{ create(
+      name                = name,
+      apiVersion          = apiVersion,
+      location            = location,
+      storageAccountName  = storageAccountName,
+      nicName             = nicName,
+      hardware_profile    = _hardware_profile,
+      os_profile          = _os_profile,
+      storage_profile     = _storage_profile,
+      network_profile     = _network_profile,
+      extensions          = _extensions,
+      diagnostics_profile = _diagnostics_profile
    )
 }}
 {%- endmacro %}

@@ -37,7 +37,7 @@ Example:
    name                = "variables('vmName')",
    apiVersion          = "[variables('apiVersion')]",
    location            = "[variables('location')]",
-   fileUris            = "",
+   fileUris            = "[]",
    PSScriptToExecute   = "",
    argument1           = ""
 )
@@ -55,7 +55,7 @@ Example:
          "type": "CustomScriptExtension",
          "typeHandlerVersion": "1.4",
          "settings": {
-	 "fileUris": [ {{ fileUris }} ],
+	 "fileUris": {{ fileUris }},
          {% if argument1 %}
 	 "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -file {{ PSScriptToExecute }} ',{{ argument1 }})]"
          {% else %}
