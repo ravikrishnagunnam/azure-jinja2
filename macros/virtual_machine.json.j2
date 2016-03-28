@@ -92,28 +92,28 @@ Example:
 
    Parameters:
 
-      name - string
-      apiVersion - string
-      location - string
-      storageAccountName - string
-      vmStorageAccountContainerName - string
-      nicName - string
-      vmSize - string
-      adminUsername - string
-      adminPassword - string
-      withSSHKey - string
-      sshKeyData - string
-      sshKeyPath - string
-      imagePublisher - string
-      imageOffer - string
-      OSVersion - string
-      version - string
-      OSDiskName - string
-      withDataDisk - string
-      sizeOfDiskInGB - string
-      dataDisk1VhdName - string
-      extension - object
-      withDiagnosticsProfile - string
+      name - string = "[variables('vmName')]"
+      apiVersion - string = "[variables('apiVersion')]"
+      location - string = "[variables('location')]"
+      storageAccountName - string = "variables('storageAccountName')"
+      vmStorageAccountContainerName - string = "variables('vmStorageAccountContainerName')"
+      nicName - string = "variables('nicName')"
+      vmSize - string = "[variables('vmSize')]"
+      adminUsername - string = "[variables('adminUsername')]"
+      adminPassword - string = "[variables('adminPassword')]"
+      withSSHKey - string = "false"
+      sshKeyData - string = "[variables('sshKeyData')]"
+      sshKeyPath - string = "[variables('sshKeyPath')]"
+      imagePublisher - string = "[variables('imagePublisher')]"
+      imageOffer - string = "[variables('imageOffer')]"
+      OSVersion - string = "[variables('OSVersion')]"
+      version - string = "latest"
+      OSDiskName - string = "variables('OSDiskName')",
+      withDataDisk - string = "true"
+      sizeOfDiskInGB - string = "[variables('sizeOfDiskInGB')]"
+      dataDisk1VhdName - string = "variables('dataDisk1VhdName')"
+      extension - object (optional)
+      withDiagnosticsProfile - string = "true"
 
 Example:
 (start code)
