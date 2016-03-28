@@ -1,0 +1,221 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "adminPassword": {
+            "metadata": {
+                "description": "Password for the Virtual Machine."
+            },
+            "type": "securestring"
+        },
+        "adminUsername": {
+            "metadata": {
+                "description": "Username for the Virtual Machine."
+            },
+            "type": "string"
+        },
+        "dnsLabelPrefix": {
+            "metadata": {
+                "description": "Unique DNS Name for the Storage Account where the Virtual Machine's disks will be placed."
+            },
+            "type": "string"
+        },
+        "sizeOfEachDataDiskInGB": {
+            "metadata": {
+                "description": "Size of each data disk in GB"
+            },
+            "type": "string"
+        },
+        "vmSize": {
+            "metadata": {
+                "description": "Size of VM"
+            },
+            "type": "string"
+        }
+    },
+    "resources": [
+        {
+            "apiVersion": "[variables('apiVersion')]",
+            "location": "[variables('location')]",
+            "name": "[variables('storageAccountName')]",
+            "properties": {
+                "accountType": "[variables('storageAccountType')]"
+            },
+            "type": "Microsoft.Storage/storageAccounts"
+        },
+        {
+            "apiVersion": "[variables('apiVersion')]",
+            "location": "[variables('location')]",
+            "name": "[variables('publicIPAddressName')]",
+            "properties": {
+                "dnsSettings": {
+                    "domainNameLabel": "[variables('dnsLabelPrefix')]"
+                },
+                "publicIPAllocationMethod": "[variables('publicIPAddressType')]"
+            },
+            "type": "Microsoft.Network/publicIPAddresses"
+        },
+        {
+            "apiVersion": "[variables('apiVersion')]",
+            "location": "[variables('location')]",
+            "name": "[variables('virtualNetworkName')]",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[variables('addressPrefix')]"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "[variables('subnetName')]",
+                        "properties": {
+                            "addressPrefix": "[variables('subnetPrefix')]"
+                        }
+                    }
+                ]
+            },
+            "type": "Microsoft.Network/virtualNetworks"
+        },
+        {
+            "apiVersion": "[variables('apiVersion')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/publicIPAddresses/',variables('publicIPAddressName'))]",
+                "[concat('Microsoft.Network/virtualNetworks/',variables('virtualNetworkName'))]"
+            ],
+            "location": "[variables('location')]",
+            "name": "[variables('nicName')]",
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
+                            },
+                            "subnet": {
+                                "id": "[concat(resourceId('Microsoft.Network/virtualNetworks',variables('virtualNetworkName')),'/subnets/',variables('subnetName'))]"
+                            }
+                        }
+                    }
+                ]
+            },
+            "type": "Microsoft.Network/networkInterfaces"
+        },
+        {
+            "apiVersion": "[variables('apiVersion')]",
+            "dependsOn": [
+                "[concat('Microsoft.Storage/storageAccounts/',variables('storageAccountName'))]",
+                "[concat('Microsoft.Network/networkInterfaces/',variables('nicName'))]"
+            ],
+            "location": "[variables('location')]",
+            "name": "[variables('vmName')]",
+            "properties": {
+                "diagnosticsProfile": {
+                    "bootDiagnostics": {
+                        "enabled": "true",
+                        "storageUri": "[concat('http://',variables('storageAccountName'),'.blob.core.windows.net')]"
+                    }
+                },
+                "hardwareProfile": {
+                    "vmSize": "[variables('vmSize')]"
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',['variables('nicName')])]"
+                        }
+                    ]
+                },
+                "osProfile": {
+                    "adminPassword": "[variables('adminPassword')]",
+                    "adminUsername": "[variables('adminUsername')]",
+                    "computerName": "[variables('vmName')]"
+                },
+                "storageProfile": {
+                    "dataDisks": [
+                        {
+                            "createOption": "Empty",
+                            "diskSizeGB": "100",
+                            "lun": 0,
+                            "name": "dataDiskName1",
+                            "vhd": {
+                                "uri": "[concat('http://',[concat(uniquestring(resourceGroup().id), 'salinuxvm')],'.blob.core.windows.net/',vhds,'/','dataDiskName1','.vhd')]"
+                            }
+                        },
+                        {
+                            "createOption": "Empty",
+                            "diskSizeGB": "100",
+                            "lun": 0,
+                            "name": "dataDiskName2",
+                            "vhd": {
+                                "uri": "[concat('http://',[concat(uniquestring(resourceGroup().id), 'salinuxvm')],'.blob.core.windows.net/',vhds,'/','dataDiskName2','.vhd')]"
+                            }
+                        },
+                        {
+                            "createOption": "Empty",
+                            "diskSizeGB": "100",
+                            "lun": 0,
+                            "name": "dataDiskName3",
+                            "vhd": {
+                                "uri": "[concat('http://',[concat(uniquestring(resourceGroup().id), 'salinuxvm')],'.blob.core.windows.net/',vhds,'/','dataDiskName3','.vhd')]"
+                            }
+                        },
+                        {
+                            "createOption": "Empty",
+                            "diskSizeGB": "100",
+                            "lun": 0,
+                            "name": "dataDiskName4",
+                            "vhd": {
+                                "uri": "[concat('http://',[concat(uniquestring(resourceGroup().id), 'salinuxvm')],'.blob.core.windows.net/',vhds,'/','dataDiskName4','.vhd')]"
+                            }
+                        }
+                    ],
+                    "imageReference": {
+                        "offer": "UbuntuServer",
+                        "publisher": "Canonical",
+                        "sku": "15.10",
+                        "version": "latest"
+                    },
+                    "osDisk": {
+                        "caching": "ReadWrite",
+                        "createOption": "FromImage",
+                        "name": "osdisk",
+                        "vhd": {
+                            "uri": "[concat('http://',[concat(uniquestring(resourceGroup().id), 'salinuxvm')],'.blob.core.windows.net/',vhds,'/',osdiskforlinuxsimple,'.vhd')]"
+                        }
+                    }
+                }
+            },
+            "type": "Microsoft.Compute/virtualMachines"
+        }
+    ],
+    "variables": {
+        "OSVersion": "2012-Datacenter",
+        "addressPrefix": "10.0.0.0/16",
+        "adminPassword": "[parameters('adminPassword')]",
+        "adminUsername": "[parameters('adminUsername')]",
+        "apiVersion": "2015-06-15",
+        "dataDisk1VhdName": "[concat('http://',variables('storageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/',variables('vmName'),'dataDisk1.vhd')]",
+        "dataDisk2VhdName": "[concat('http://',variables('storageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/',variables('vmName'),'dataDisk2.vhd')]",
+        "dataDisk3VhdName": "[concat('http://',variables('storageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/',variables('vmName'),'dataDisk3.vhd')]",
+        "dataDisk4VhdName": "[concat('http://',variables('storageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/',variables('vmName'),'dataDisk4.vhd')]",
+        "dnsLabelPrefix": "[parameters('dnsLabelPrefix')]",
+        "imageOffer": "WindowsServer",
+        "imagePublisher": "MicrosoftWindowsServer",
+        "location": "[resourceGroup().location]",
+        "nicName": "myNIC",
+        "publicIPAddressName": "myPublicIP",
+        "publicIPAddressType": "Dynamic",
+        "storageAccountName": "[concat(uniquestring(resourceGroup().id), 'saddiskvm')]",
+        "storageAccountType": "Standard_LRS",
+        "subnetName": "Subnet-1",
+        "subnetPrefix": "10.0.0.0/24",
+        "subnetRef": "[concat(variables('vnetID'),'/subnets/',variables('subnetName'))]",
+        "virtualNetworkName": "myVNET",
+        "vmName": "myVM",
+        "vmSize": "[parameters('vmSize')]",
+        "vmStorageAccountContainerName": "vhds",
+        "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',variables('virtualNetworkName'))]"
+    }
+}

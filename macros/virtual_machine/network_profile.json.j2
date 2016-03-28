@@ -31,3 +31,30 @@
    ]
 }
 {%- endmacro %}
+
+{#
+   macro: from_vars
+   Create a new *network_profile* to be used in a *virtual machine* (see <virtual_machine>).
+
+   Parameters:
+
+      nicName - stringi =  "['variables('nicName')]", name of an existing *network interface* (see <network_interface>)
+
+   Example:
+(start code)
+{% import 'azure-jinja2/macros/virtual_machine/network_profile.json.j2' as vm_network_profile %}
+
+   {{ vm_network_profile.from_vars() }}
+
+(end)
+
+#}
+
+{% macro from_vars(
+     nicName = "variables('nicName')"
+   )
+-%}
+{{
+   create(nicName = nicName)
+}}
+{%- endmacro %}

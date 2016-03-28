@@ -17,7 +17,7 @@
       storage_profile - object, *storage profile* (see <virtual_machine/storage_profile>)
       network_profile - object, *network_profile* (see <virtual_machine/network_profile>) 
       diagnostics_profile - object, *diagnostics profile* (see <virtual_machine/diagnostics_profile>)
-      extensions - array, list of *virtual machine extension* to add to the VM (see <virtual_machine_extension>)
+      extensions - array (optional), list of *virtual machine extension* to add to the VM (see <virtual_machine_extension>)
 
 Example:
 (start code)
@@ -57,7 +57,7 @@ Example:
    storage_profile,
    network_profile,
    diagnostics_profile,
-   extensions
+   extensions = ""
 )
 -%}
 {
@@ -160,27 +160,23 @@ Example:
 -%}
 {% import 'azure-jinja2/macros/virtual_machine/hardware_profile.json.j2' as vm_hw_profile %}
 {% set _hardware_profile %}
-{{ vm_hw_profile.create(vmSize = vmSize)}}
+{{ vm_hw_profile.from_vars(
+      vmSize = vmSize
+   )
+}}
 {% endset %}
 
 {% import 'azure-jinja2/macros/virtual_machine/os_profile.json.j2' as vm_os_profile %}
 
-{% if withSSHKey != "false" %}
-{% set _sshKeyData %}{{ sshKeyData }}{% endset %}
-{% set _sshKeyPath %}{{ sshKeyPath }}{% endset %}
-{% else %}
-{% set _sshKeyData %}{% endset %}
-{% set _sshKeyPath %}{% endset %}
-{% endif %}
-
 {% set _os_profile %}
-{{ vm_os_profile.create(
-      name = name,
-      adminUsername = adminUsername,
-      adminPassword = adminPassword,
-      sshKeyData = _sshKeyData,
-      sshKeyPath = _sshKeyPath
-   )
+{{ vm_os_profile.from_vars(
+     name          = name,
+     adminUsername = adminUsername,
+     adminPassword = adminPassword,
+     withSSHKey    = withSSHKey,
+     sshKeyData    = sshKeyData,
+     sshKeyPath    = sshKeyPath
+   ) 
 }}
 {% endset %}
 
@@ -223,7 +219,7 @@ Example:
 {% import 'azure-jinja2/macros/virtual_machine/network_profile.json.j2' as vm_network_profile %}
 
 {% set _network_profile %}
-{{ vm_network_profile.create(
+{{ vm_network_profile.from_vars(
       nicName = nicName
    )
 }}

@@ -82,3 +82,31 @@
      {% endif %}
 }
 {%- endmacro %}
+
+{% macro from_vars(
+     name          = "[variables('vmName')]",
+     adminUsername = "[variables('adminUsername')]",
+     adminPassword = "[variables('adminPassword')]",
+     withSSHKey    = "false",
+     sshKeyData    = "[variables('sshKeyData')]",
+     sshKeyPath    = "[variables('sshKeyPath')]",
+     customData    = ""
+   )
+-%}
+{% if withSSHKey != "false" %}
+{% set _sshKeyData %}{{ sshKeyData }}{% endset %}
+{% set _sshKeyPath %}{{ sshKeyPath }}{% endset %}
+{% else %}
+{% set _sshKeyData %}{% endset %}
+{% set _sshKeyPath %}{% endset %}
+{% endif %}
+
+{{ create(
+      name = name,
+      adminUsername = adminUsername,
+      adminPassword = adminPassword,
+      sshKeyData = _sshKeyData,
+      sshKeyPath = _sshKeyPath
+   )
+}}
+{%- endmacro %}

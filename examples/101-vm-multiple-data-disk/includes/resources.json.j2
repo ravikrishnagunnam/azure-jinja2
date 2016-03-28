@@ -1,0 +1,76 @@
+{% import 'azure-jinja2/macros/storage_account.json.j2' as storage_account %}
+{% import 'azure-jinja2/macros/virtual_network.json.j2' as virtual_network %}
+{% import 'azure-jinja2/macros/public_ip_address.json.j2' as public_ip_address %}
+{% import 'azure-jinja2/macros/network_interface.json.j2' as network_interface %}
+{% import 'azure-jinja2/macros/virtual_machine.json.j2' as virtual_machine %}
+{% import 'azure-jinja2/macros/virtual_machine/data_disk.json.j2' as vm_data_disk %}
+{% import 'azure-jinja2/macros/virtual_machine/storage_profile.json.j2' as vm_storage_profile %}
+{% import 'azure-jinja2/macros/virtual_machine/hardware_profile.json.j2' as vm_hardware_profile %}
+{% import 'azure-jinja2/macros/virtual_machine/os_profile.json.j2' as vm_os_profile %}
+{% import 'azure-jinja2/macros/virtual_machine/network_profile.json.j2' as vm_network_profile %}
+{% import 'azure-jinja2/macros/virtual_machine/diagnostics_profile.json.j2' as vm_diag_profile %}
+
+"resources" : [
+    {{ storage_account.from_vars() }}
+    ,
+    {{ public_ip_address.from_vars(withDNS = "true") }}
+    ,
+    {{ virtual_network.from_vars() }}
+    ,
+    {{ network_interface.from_vars(withPublicIP="true") }}
+    ,
+
+    {% set dataDisks %}
+    [
+    {% for index in [1,2,3,4] %}
+       {% set lun %}{{ loop.index0 }}{% endset %}
+       {% set name %}datadisk{{ index }}{% endset %}
+       {% set dataDiskName %}'datadisk{{ index }}'{% endset %}
+       {{ vm_data_disk.create(
+             name = name,
+             storageAccountName = "variables('storageAccountName')",
+             vmStorageAccountContainerName = "variables('vmStorageAccountContainerName')",
+             lun = lun,
+             sizeOfDiskInGB = "[variables('sizeOfDiskInGB')]",
+             dataDiskVhdName = dataDiskName
+          )
+       }}
+
+       {% if not loop.last %},{% endif %}
+    {% endfor %}
+    ]
+    {% endset %}
+
+    {% set storage_profile %}
+    {{ vm_storage_profile.create(
+          storageAccountName = "variables('storageAccountName')",
+          vmStorageAccountContainerName = "variables('vmStorageAccountContainerName')",
+          imagePublisher = "[variables('imagePublisher')]",
+          imageOffer = "[variables('imageOffer')]",
+          OSVersion = "[variables('OSVersion')]",
+          version = "latest",
+          OSDiskName = "variables('OSDiskName')",
+          dataDisks = dataDisks
+       ) 
+    }}
+    {% endset %}
+
+    {% set hardware_profile %}{{ vm_hardware_profile.from_vars() }}{% endset %}
+    {% set os_profile %}{{ vm_os_profile.from_vars() }}{% endset %}
+    {% set network_profile %}{{ vm_network_profile.from_vars() }}{% endset %}
+    {% set diagnostics_profile %}{{ vm_diag_profile.from_vars() }}{% endset %}
+
+    {{ virtual_machine.create(
+          name = "[variables('vmName')]",
+          apiVersion = "[variables('apiVersion')]",
+          location = "[variables('location')]",
+          storageAccountName = "variables('storageAccountName')",
+          nicName = "variables('nicName')",
+          hardware_profile = hardware_profile,
+          os_profile = os_profile,
+          storage_profile = storage_profile,
+          network_profile = network_profile,
+          diagnostics_profile = diagnostics_profile
+       )
+    }}
+]

@@ -83,3 +83,52 @@
       {% endif %}
 }
 {%- endmacro %}
+
+
+{% macro from_vars(
+     storageAccountName            = "variables('storageAccountName')",
+     vmStorageAccountContainerName = "variables('vmStorageAccountContainerName')",
+     imagePublisher                = "[variables('imagePublisher')]",
+     imageOffer                    = "[variables('imageOffer')]",
+     OSVersion                     = "[variables('OSVersion')]",
+     version                       = "latest",
+     OSDiskName                    = "variables('OSDiskName')",
+     withDataDisk                  = "true",
+     sizeOfDiskInGB                = "[variables('sizeOfDiskInGB')]",
+     dataDisk1VhdName              = "variables('dataDisk1VhdName')"
+   )
+-%}
+{% if withDataDisk == "true" %}
+{% import 'azure-jinja2/macros/virtual_machine/data_disk.json.j2' as vm_data_disk %}
+
+{% set _dataDisks %}
+[
+   {{ vm_data_disk.create(
+         name = "datadisk1",
+         storageAccountName = storageAccountName,
+         vmStorageAccountContainerName = vmStorageAccountContainerName,
+         sizeOfDiskInGB = sizeOfDiskInGB,
+         dataDiskVhdName = dataDisk1VhdName
+      )
+   }}
+]
+{% endset %}
+{% else %}
+{% set _dataDisks %}{% endset %}
+{% endif %}
+
+{% import 'azure-jinja2/macros/virtual_machine/storage_profile.json.j2' as vm_storage_profile %}
+
+{{ vm_storage_profile.create(
+      storageAccountName = storageAccountName,
+      vmStorageAccountContainerName = vmStorageAccountContainerName,
+      imagePublisher = imagePublisher,
+      imageOffer= imageOffer,
+      OSVersion = OSVersion,
+      version = version,
+      OSDiskName = OSDiskName,
+      dataDisks = _dataDisks
+   )
+}}
+
+{%- endmacro %}
