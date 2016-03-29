@@ -23,7 +23,7 @@
     "vmSize": {
       "type": "string",
       "metadata": {
-        "description": "Size of VM"
+        "description": "Size of VM, it should support at least 4 data drives (ex: Standard_A2)"
       }
     },
     "sizeOfEachDataDiskInGB": {
