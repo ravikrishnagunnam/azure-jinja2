@@ -16,7 +16,7 @@
 
 ## Usage
 * Generate your ARM template with your master jinja2 file
-  `j2 azuredeploy.json.j2 > generated/azuredeploy.json` 
+  * `j2 azuredeploy.json.j2 > generated/azuredeploy.json` 
 * You can pretty-print it with jq (keep order) or json.tool (order is lost)
   * `j2 azuredeploy.json.j2 | jq . > generated/azuredeploy.json`
   * `j2 azuredeploy.json.j2 | python -m json.tool > generated/azuredeploy.json`
