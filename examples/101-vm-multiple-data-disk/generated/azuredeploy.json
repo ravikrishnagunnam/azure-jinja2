@@ -38,6 +38,7 @@
     "adminPassword": "[parameters('adminPassword')]",
     "dnsLabelPrefix": "[parameters('dnsLabelPrefix')]",
     "vmSize": "[parameters('vmSize')]",
+    "sizeOfDiskInGB": "[parameters('sizeOfEachDataDiskInGB')]",
     "storageAccountName": "[concat(uniquestring(resourceGroup().id), 'saddiskvm')]",
     "location": "[resourceGroup().location]",
     "addressPrefix": "10.0.0.0/16",
@@ -59,7 +60,8 @@
     "dataDisk2VhdName": "[concat('http://',variables('storageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/',variables('vmName'),'dataDisk2.vhd')]",
     "dataDisk3VhdName": "[concat('http://',variables('storageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/',variables('vmName'),'dataDisk3.vhd')]",
     "dataDisk4VhdName": "[concat('http://',variables('storageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/',variables('vmName'),'dataDisk4.vhd')]",
-    "apiVersion": "2015-06-15"
+    "apiVersion": "2015-06-15",
+    "OSDiskName": "osdisk"
   },
   "resources": [
     {
