@@ -23,3 +23,6 @@
 
 ## API Reference
 * HTML documentation of all macros is in the [docs directory](docs)
+
+## BTW 
+* You may find my [ARM template checker](https://github.com/sebbrochet/azure-arm-checker) useful to catch some errors before deploying your template on Azure...
