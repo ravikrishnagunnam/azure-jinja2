@@ -1,5 +1,9 @@
 # Some jinja2 macros to simplify Azure ARM templates development
 
+[![Circle CI](https://circleci.com/gh/sebbrochet/azure-jinja2.svg?style=svg)](https://circleci.com/gh/sebbrochet/azure-jinja2)
+[![Build Status](https://travis-ci.org/sebbrochet/azure-jinja2.svg?branch=master)](https://travis-ci.org/sebbrochet/azure-jinja2)
+[![Build Status](https://drone.io/github.com/sebbrochet/azure-jinja2/status.png)](https://drone.io/github.com/sebbrochet/azure-jinja2/latest)
+
 ## Requirements
 * jinja2 CLI
   * `pip install j2cli`
