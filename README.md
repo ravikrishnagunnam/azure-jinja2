@@ -5,12 +5,12 @@
 [![Build Status](https://drone.io/github.com/sebbrochet/azure-jinja2/status.png)](https://drone.io/github.com/sebbrochet/azure-jinja2/latest)
 
 ## Requirements
-* jinja2 CLI
+* [jinja2 CLI](https://github.com/kolypto/j2cli)
   * `pip install j2cli`
-* jq for pretty-printing (optional)
+* [jq](https://github.com/stedolan/jq) for pretty-printing
   * Use your package manager (apt, yum, ...)
 
-## Intallation
+## Installation
 * Clone this repo
   * `git clone https://github.com/sebbrochet/azure-jinja2.git`
 * Create a symbolic link in the directory where you plan to use the macro
@@ -19,7 +19,7 @@
 * Hack your ARM templates as shown in the [examples](examples) directory...
 
 ## Usage
-* Generate your ARM template with your master jinja2 file
+* Generate your ARM template with your master jinja2 file (f.e azuredeploy.json.j2)
   * `j2 azuredeploy.json.j2 > generated/azuredeploy.json` 
 * You can pretty-print it with jq (keep order) or json.tool (order is lost)
   * `j2 azuredeploy.json.j2 | jq . > generated/azuredeploy.json`
