@@ -1,0 +1,7 @@
+dependencies:
+  pre:
+    - pip install j2cli
+    - sudo apt-get install jq
+test:
+  override:
+    - cd examples && ./check_examples.sh
