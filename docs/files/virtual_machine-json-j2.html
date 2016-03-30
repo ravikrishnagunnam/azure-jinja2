@@ -13,25 +13,53 @@ if (browserType) {document.write("<div class=" + browserType + ">");if (browserV
 
 <div class="CGroup"><div class=CTopic><h3 class=CTitle><a name="virtual_machine.Macros"></a>Macros</h3></div></div>
 
-<div class="CMacro"><div class=CTopic><h3 class=CTitle><a name="virtual_machine.create"></a>create</h3><div class=CBody><p>Create a new <b>virtual machine</b>.</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>name</td><td class=CDLDescription>string</td></tr><tr><td class=CDLEntry>apiVersion</td><td class=CDLDescription>string</td></tr><tr><td class=CDLEntry>location</td><td class=CDLDescription>string</td></tr><tr><td class=CDLEntry>storageAccountName</td><td class=CDLDescription>string</td></tr><tr><td class=CDLEntry>nicNames</td><td class=CDLDescription>array, list of NIC names of existing <b>network interface</b> (see <a href="network_interface-json-j2.html#network_interface" class=LClass id=link1 onMouseOver="ShowTip(event, 'tt1', 'link1')" onMouseOut="HideTip('tt1')">network_interface</a>)</td></tr><tr><td class=CDLEntry>hardware_profile</td><td class=CDLDescription>object, &ldquo;<b>hardware profile</b> (see <a href="virtual_machine/hardware_profile-json-j2.html#virtual_machine/hardware_profile" class=LClass id=link2 onMouseOver="ShowTip(event, 'tt2', 'link2')" onMouseOut="HideTip('tt2')">virtual_machine/hardware_profile</a>)</td></tr><tr><td class=CDLEntry>os_profile</td><td class=CDLDescription>object, <b>os profile</b> (see <a href="virtual_machine/os_profile-json-j2.html#virtual_machine/os_profile" class=LClass id=link3 onMouseOver="ShowTip(event, 'tt3', 'link3')" onMouseOut="HideTip('tt3')">virtual_machine/os_profile</a>)</td></tr><tr><td class=CDLEntry>storage_profile</td><td class=CDLDescription>object, <b>storage profile</b> (see <a href="virtual_machine/storage_profile-json-j2.html#virtual_machine/storage_profile" class=LClass id=link4 onMouseOver="ShowTip(event, 'tt4', 'link4')" onMouseOut="HideTip('tt4')">virtual_machine/storage_profile</a>)</td></tr><tr><td class=CDLEntry>network_profile</td><td class=CDLDescription>object, <b>network_profile</b> (see <a href="virtual_machine/network_profile-json-j2.html#virtual_machine/network_profile" class=LClass id=link5 onMouseOver="ShowTip(event, 'tt5', 'link5')" onMouseOut="HideTip('tt5')">virtual_machine/network_profile</a>)</td></tr><tr><td class=CDLEntry>diagnostics_profile</td><td class=CDLDescription>object, <b>diagnostics profile</b> (see <a href="virtual_machine/diagnostics_profile-json-j2.html#virtual_machine/diagnostics_profile" class=LClass id=link6 onMouseOver="ShowTip(event, 'tt6', 'link6')" onMouseOut="HideTip('tt6')">virtual_machine/diagnostics_profile</a>)</td></tr><tr><td class=CDLEntry>extensions</td><td class=CDLDescription>array (optional), list of <b>virtual machine extension</b> to add to the VM (see <a href="virtual_machine_extension-json-j2.html#virtual_machine_extension" class=LClass id=link7 onMouseOver="ShowTip(event, 'tt7', 'link7')" onMouseOut="HideTip('tt7')">virtual_machine_extension</a>)</td></tr></table><h4 class=CHeading>Example</h4><blockquote><pre class="prettyprint">{% import 'azure-jinja2/macros/network_interface.json.j2' as virtual_machine %}
+<div class="CMacro"><div class=CTopic><h3 class=CTitle><a name="virtual_machine.create"></a>create</h3><div class=CBody><p>Create a new <b>virtual machine</b>.</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>name</td><td class=CDLDescription>string</td></tr><tr><td class=CDLEntry>apiVersion</td><td class=CDLDescription>string</td></tr><tr><td class=CDLEntry>location</td><td class=CDLDescription>string</td></tr><tr><td class=CDLEntry>storageAccountName</td><td class=CDLDescription>string</td></tr><tr><td class=CDLEntry>nicNames</td><td class=CDLDescription>array, list of NIC names of existing <b>network interface</b> (see <a href="network_interface-json-j2.html#network_interface" class=LClass id=link1 onMouseOver="ShowTip(event, 'tt1', 'link1')" onMouseOut="HideTip('tt1')">network_interface</a>)</td></tr><tr><td class=CDLEntry>hardware_profile</td><td class=CDLDescription>object, &ldquo;<b>hardware profile</b> (see <a href="virtual_machine/hardware_profile-json-j2.html#virtual_machine/hardware_profile" class=LClass id=link2 onMouseOver="ShowTip(event, 'tt2', 'link2')" onMouseOut="HideTip('tt2')">virtual_machine/hardware_profile</a>)</td></tr><tr><td class=CDLEntry>os_profile</td><td class=CDLDescription>object, <b>os profile</b> (see <a href="virtual_machine/os_profile-json-j2.html#virtual_machine/os_profile" class=LClass id=link3 onMouseOver="ShowTip(event, 'tt3', 'link3')" onMouseOut="HideTip('tt3')">virtual_machine/os_profile</a>)</td></tr><tr><td class=CDLEntry>storage_profile</td><td class=CDLDescription>object, <b>storage profile</b> (see <a href="virtual_machine/storage_profile-json-j2.html#virtual_machine/storage_profile" class=LClass id=link4 onMouseOver="ShowTip(event, 'tt4', 'link4')" onMouseOut="HideTip('tt4')">virtual_machine/storage_profile</a>)</td></tr><tr><td class=CDLEntry>network_profile</td><td class=CDLDescription>object, <b>network_profile</b> (see <a href="virtual_machine/network_profile-json-j2.html#virtual_machine/network_profile" class=LClass id=link5 onMouseOver="ShowTip(event, 'tt5', 'link5')" onMouseOut="HideTip('tt5')">virtual_machine/network_profile</a>)</td></tr><tr><td class=CDLEntry>diagnostics_profile</td><td class=CDLDescription>object, <b>diagnostics profile</b> (see <a href="virtual_machine/diagnostics_profile-json-j2.html#virtual_machine/diagnostics_profile" class=LClass id=link6 onMouseOver="ShowTip(event, 'tt6', 'link6')" onMouseOut="HideTip('tt6')">virtual_machine/diagnostics_profile</a>)</td></tr><tr><td class=CDLEntry>extensions</td><td class=CDLDescription>array (optional), list of <b>virtual machine extension</b> to add to the VM (see <a href="virtual_machine_extension-json-j2.html#virtual_machine_extension" class=LClass id=link7 onMouseOver="ShowTip(event, 'tt7', 'link7')" onMouseOut="HideTip('tt7')">virtual_machine_extension</a>)</td></tr></table><h4 class=CHeading>Example</h4><blockquote><pre class="prettyprint">{% import 'azure-jinja2/macros/storage_account.json.j2' as storage_account %}
+{% import 'azure-jinja2/macros/virtual_network.json.j2' as virtual_network %}
+{% import 'azure-jinja2/macros/network_interface.json.j2' as network_interface %}
+{% import 'azure-jinja2/macros/virtual_machine.json.j2' as virtual_machine %}
+{% import 'azure-jinja2/macros/virtual_machine/data_disk.json.j2' as vm_data_disk %}
+{% import 'azure-jinja2/macros/virtual_machine/storage_profile.json.j2' as vm_storage_profile %}
+{% import 'azure-jinja2/macros/virtual_machine/hardware_profile.json.j2' as vm_hardware_profile %}
+{% import 'azure-jinja2/macros/virtual_machine/os_profile.json.j2' as vm_os_profile %}
+{% import 'azure-jinja2/macros/virtual_machine/network_profile.json.j2' as vm_network_profile %}
+{% import 'azure-jinja2/macros/virtual_machine/diagnostics_profile.json.j2' as vm_diag_profile %}
 
-{
-  &quot;$schema&quot;: &quot;https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#&quot;,
-  &quot;contentVersion&quot;: &quot;1.0.0.0&quot;,
-  &quot;variables&quot;: {
-    ...
-  },
-  &quot;resources&quot; : [
-    ...,
+&quot;resources&quot; : [
+    {{ storage_account.from_vars() }}
+    ,
+    {{ virtual_network.from_vars() }}
+    ,
+    {{ network_interface.from_vars(name = &quot;nic1&quot;) }}
+    ,
+    {{ network_interface.from_vars(name = &quot;nic2&quot;) }}
+    ,
+    {% set hardware_profile %}{{ vm_hardware_profile.from_vars() }}{% endset %}
+    {% set os_profile %}{{ vm_os_profile.from_vars() }}{% endset %}
+    {% set storage_profile %}{{ vm_storage_profile.from_vars() }}{% endset %}
+
+    {% set network_profile %}
+       {{ vm_network_profile.create(
+             nicNames = [&quot;'nic1'&quot;, &quot;'nic2'&quot;]
+          )
+       }}
+    {% endset %}
+
+    {% set diagnostics_profile %}{{ vm_diag_profile.from_vars() }}{% endset %}
+
     {{ virtual_machine.create(
-          name = &quot;myVM&quot;,
-          apiVersion = &quot;2015-06-15&quot;,
-          location = &quot;West Europe&quot;,
-          ...
+          name = &quot;[variables('vmName')]&quot;,
+          apiVersion = &quot;[variables('apiVersion')]&quot;,
+          location = &quot;[variables('location')]&quot;,
+          storageAccountName = &quot;variables('storageAccountName')&quot;,
+          nicNames = [&quot;'nic1'&quot;, &quot;'nic2'&quot;],
+          hardware_profile = hardware_profile,
+          os_profile = os_profile,
+          storage_profile = storage_profile,
+          network_profile = network_profile,
+          diagnostics_profile = diagnostics_profile
        )
     }}
-  ]
-}</pre></blockquote></div></div></div>
+]</pre></blockquote></div></div></div>
 
 <div class="CMacro"><div class=CTopic><h3 class=CTitle><a name="virtual_machine.from_vars"></a>from_vars</h3><div class=CBody><p>Create a new <b>virtual machine</b> from variables.</p><h4 class=CHeading>Parameters</h4><table border=0 cellspacing=0 cellpadding=0 class=CDescriptionList><tr><td class=CDLEntry>name</td><td class=CDLDescription>string = &ldquo;[variables(&lsquo;vmName&rsquo;)]&rdquo;</td></tr><tr><td class=CDLEntry>apiVersion</td><td class=CDLDescription>string = &ldquo;[variables(&lsquo;apiVersion&rsquo;)]&rdquo;</td></tr><tr><td class=CDLEntry>location</td><td class=CDLDescription>string = &ldquo;[variables(&lsquo;location&rsquo;)]&rdquo;</td></tr><tr><td class=CDLEntry>storageAccountName</td><td class=CDLDescription>string = &ldquo;variables(&lsquo;storageAccountName&rsquo;)&rdquo;</td></tr><tr><td class=CDLEntry>vmStorageAccountContainerName</td><td class=CDLDescription>string = &ldquo;variables(&lsquo;vmStorageAccountContainerName&rsquo;)&rdquo;</td></tr><tr><td class=CDLEntry>nicName</td><td class=CDLDescription>string = &ldquo;variables(&lsquo;nicName&rsquo;)&rdquo;</td></tr><tr><td class=CDLEntry>vmSize</td><td class=CDLDescription>string = &ldquo;[variables(&lsquo;vmSize&rsquo;)]&rdquo;</td></tr><tr><td class=CDLEntry>adminUsername</td><td class=CDLDescription>string = &ldquo;[variables(&lsquo;adminUsername&rsquo;)]&rdquo;</td></tr><tr><td class=CDLEntry>adminPassword</td><td class=CDLDescription>string = &ldquo;[variables(&lsquo;adminPassword&rsquo;)]&rdquo;</td></tr><tr><td class=CDLEntry>withSSHKey</td><td class=CDLDescription>string = &ldquo;false&rdquo;</td></tr><tr><td class=CDLEntry>sshKeyData</td><td class=CDLDescription>string = &ldquo;[variables(&lsquo;sshKeyData&rsquo;)]&rdquo;</td></tr><tr><td class=CDLEntry>sshKeyPath</td><td class=CDLDescription>string = &ldquo;[variables(&lsquo;sshKeyPath&rsquo;)]&rdquo;</td></tr><tr><td class=CDLEntry>imagePublisher</td><td class=CDLDescription>string = &ldquo;[variables(&lsquo;imagePublisher&rsquo;)]&rdquo;</td></tr><tr><td class=CDLEntry>imageOffer</td><td class=CDLDescription>string = &ldquo;[variables(&lsquo;imageOffer&rsquo;)]&rdquo;</td></tr><tr><td class=CDLEntry>OSVersion</td><td class=CDLDescription>string = &ldquo;[variables(&lsquo;OSVersion&rsquo;)]&rdquo;</td></tr><tr><td class=CDLEntry>version</td><td class=CDLDescription>string = &ldquo;latest&rdquo;</td></tr><tr><td class=CDLEntry>OSDiskName</td><td class=CDLDescription>string = &ldquo;variables(&lsquo;OSDiskName&rsquo;)&rdquo;,</td></tr><tr><td class=CDLEntry>withDataDisk</td><td class=CDLDescription>string = &ldquo;true&rdquo;</td></tr><tr><td class=CDLEntry>sizeOfDiskInGB</td><td class=CDLDescription>string = &ldquo;[variables(&lsquo;sizeOfDiskInGB&rsquo;)]&rdquo;</td></tr><tr><td class=CDLEntry>dataDisk1VhdName</td><td class=CDLDescription>string = &ldquo;variables(&lsquo;dataDisk1VhdName&rsquo;)&rdquo;</td></tr><tr><td class=CDLEntry>extension</td><td class=CDLDescription>object (optional)</td></tr><tr><td class=CDLEntry>withDiagnosticsProfile</td><td class=CDLDescription>string = &ldquo;true&rdquo;</td></tr></table><h4 class=CHeading>Example</h4><blockquote><pre class="prettyprint">{% import 'azure-jinja2/macros/virtual_machine.json.j2' as virtual_machine %}
 

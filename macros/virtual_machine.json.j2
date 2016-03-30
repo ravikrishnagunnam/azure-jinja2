@@ -21,25 +21,53 @@
 
 Example:
 (start code)
-{% import 'azure-jinja2/macros/network_interface.json.j2' as virtual_machine %}
+{% import 'azure-jinja2/macros/storage_account.json.j2' as storage_account %}
+{% import 'azure-jinja2/macros/virtual_network.json.j2' as virtual_network %}
+{% import 'azure-jinja2/macros/network_interface.json.j2' as network_interface %}
+{% import 'azure-jinja2/macros/virtual_machine.json.j2' as virtual_machine %}
+{% import 'azure-jinja2/macros/virtual_machine/data_disk.json.j2' as vm_data_disk %}
+{% import 'azure-jinja2/macros/virtual_machine/storage_profile.json.j2' as vm_storage_profile %}
+{% import 'azure-jinja2/macros/virtual_machine/hardware_profile.json.j2' as vm_hardware_profile %}
+{% import 'azure-jinja2/macros/virtual_machine/os_profile.json.j2' as vm_os_profile %}
+{% import 'azure-jinja2/macros/virtual_machine/network_profile.json.j2' as vm_network_profile %}
+{% import 'azure-jinja2/macros/virtual_machine/diagnostics_profile.json.j2' as vm_diag_profile %}
 
-{
-  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-  "contentVersion": "1.0.0.0",
-  "variables": {
-    ...
-  },
-  "resources" : [
-    ...,
+"resources" : [
+    {{ storage_account.from_vars() }}
+    ,
+    {{ virtual_network.from_vars() }}
+    ,
+    {{ network_interface.from_vars(name = "nic1") }}
+    ,
+    {{ network_interface.from_vars(name = "nic2") }}
+    ,
+    {% set hardware_profile %}{{ vm_hardware_profile.from_vars() }}{% endset %}
+    {% set os_profile %}{{ vm_os_profile.from_vars() }}{% endset %}
+    {% set storage_profile %}{{ vm_storage_profile.from_vars() }}{% endset %}
+
+    {% set network_profile %}
+       {{ vm_network_profile.create(
+             nicNames = ["'nic1'", "'nic2'"]
+          )
+       }}
+    {% endset %}
+
+    {% set diagnostics_profile %}{{ vm_diag_profile.from_vars() }}{% endset %}
+
     {{ virtual_machine.create(
-          name = "myVM",
-          apiVersion = "2015-06-15",
-          location = "West Europe",
-          ...
+          name = "[variables('vmName')]",
+          apiVersion = "[variables('apiVersion')]",
+          location = "[variables('location')]",
+          storageAccountName = "variables('storageAccountName')",
+          nicNames = ["'nic1'", "'nic2'"],
+          hardware_profile = hardware_profile,
+          os_profile = os_profile,
+          storage_profile = storage_profile,
+          network_profile = network_profile,
+          diagnostics_profile = diagnostics_profile
        )
     }}
-  ]
-}
+]
 
 (end)
 
