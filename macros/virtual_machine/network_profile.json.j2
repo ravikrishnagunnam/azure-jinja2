@@ -7,27 +7,39 @@
 
    Parameters:
 
-      nicName - string, name of an existing *network interface* (see <network_interface>)
+      nicNames - array of string, names of existing *network interface* (see <network_interface>)
 
    Example:
 (start code)
 {% import 'azure-jinja2/macros/virtual_machine/network_profile.json.j2' as vm_network_profile %}
 
-   {{ vm_network_profile.create("MyNIC") }}
+   {{ vm_network_profile.create(["'MyNIC'"]) }}
 
 (end)
 
 #}
 
 {% macro create(
-     nicName
+     nicNames
    )
 -%}
 {
    "networkInterfaces": [
+      {% for nicName in nicNames %}
       {
-         "id": "[resourceId('Microsoft.Network/networkInterfaces',{{ nicName }})]"
+      {% if loop.length > 1 %}
+      "properties": {
+         {% if loop.first %}
+         "primary": true
+         {% else %}
+         "primary": false
+         {% endif %}
+      },
+      {% endif %}
+      "id": "[resourceId('Microsoft.Network/networkInterfaces',{{ nicName }})]"
       }
+      {% if not loop.last %},{% endif %}
+      {% endfor %}
    ]
 }
 {%- endmacro %}
@@ -38,7 +50,7 @@
 
    Parameters:
 
-      nicName - stringi =  "['variables('nicName')]", name of an existing *network interface* (see <network_interface>)
+      nicName - string =  "['variables('nicName')]", name of an existing *network interface* (see <network_interface>)
 
    Example:
 (start code)
@@ -54,7 +66,11 @@
      nicName = "variables('nicName')"
    )
 -%}
+
+{% set _nicName %}{{ nicName }}{% endset %}
+{% set _nicNames = [ _nicName ] %}
+
 {{
-   create(nicName = nicName)
+   create(nicNames = _nicNames)
 }}
 {%- endmacro %}

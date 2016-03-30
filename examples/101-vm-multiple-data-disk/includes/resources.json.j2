@@ -65,7 +65,7 @@
           apiVersion = "[variables('apiVersion')]",
           location = "[variables('location')]",
           storageAccountName = "variables('storageAccountName')",
-          nicName = "variables('nicName')",
+          nicNames = ["variables('nicName')"],
           hardware_profile = hardware_profile,
           os_profile = os_profile,
           storage_profile = storage_profile,

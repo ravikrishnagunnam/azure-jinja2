@@ -11,7 +11,7 @@
       apiVersion - string
       location - string
       storageAccountName - string
-      nicName - string, name of an existing *network interface* (see <network_interface>)
+      nicNames - array, list of NIC names of existing *network interface* (see <network_interface>)
       hardware_profile - object, "*hardware profile* (see <virtual_machine/hardware_profile>)
       os_profile - object, *os profile* (see <virtual_machine/os_profile>)
       storage_profile - object, *storage profile* (see <virtual_machine/storage_profile>)
@@ -51,7 +51,7 @@ Example:
    apiVersion,
    location,
    storageAccountName,
-   nicName,
+   nicNames,
    hardware_profile,
    os_profile,
    storage_profile,
@@ -67,7 +67,10 @@ Example:
       "location": "{{ location }}",
       "dependsOn": [
         "[concat('Microsoft.Storage/storageAccounts/',{{ storageAccountName }})]",
+        {% for nicName in nicNames %}
         "[concat('Microsoft.Network/networkInterfaces/',{{ nicName }})]"
+        {% if not loop.last %},{% endif %}
+        {% endfor %}
       ],
       "properties": {
         "hardwareProfile": {{ hardware_profile }},
@@ -243,12 +246,15 @@ Example:
 {% set _extensions %}{% endset %}
 {% endif %}
 
+{% set _nicName %}{{ nicName }}{% endset %}
+{% set _nicNames = [ _nicName ] %}
+
 {{ create(
       name                = name,
       apiVersion          = apiVersion,
       location            = location,
       storageAccountName  = storageAccountName,
-      nicName             = nicName,
+      nicNames            = _nicNames,
       hardware_profile    = _hardware_profile,
       os_profile          = _os_profile,
       storage_profile     = _storage_profile,
