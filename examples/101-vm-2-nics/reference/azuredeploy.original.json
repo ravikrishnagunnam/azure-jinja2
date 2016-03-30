@@ -44,7 +44,7 @@
     "storageAccountType": "Standard_LRS",
     "vmStorageAccountContainerName": "vhds",
     "vmName": "MyUbuntuVM",
-    "vmSize": "Standard_D1",
+    "vmSize": "Standard_D2",
     "virtualNetworkName": "MyVNET",
     "apiVersion": "2015-06-15"
   },
